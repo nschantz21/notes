@@ -1,0 +1,125 @@
+Chapter 19: Functions
+
+    The most important thing is to be consistent.
+    
+    Pulling out intermediate calculations into named variables is a good practice because it makes it more clear what the code is doing.
+    
+    syntax for defining function:
+        function_name <- function(parameters) {
+            function_logic
+            result_line
+        }
+        
+    The result of the last line is “returned” from the function.
+    
+    You can define variables within functions.
+    These are also treated specially — they do not affect the main workspace (the “global environment”) and are destroyed when the function ends. If you had some value v in the global environment, it would be ignored in this function as soon as the local v was defined, with the local definition used instead.
+    
+    This is an important part of the “do not repeat yourself” (or DRY) principle. The more repetition you have in your code, the more places you need to remember to update when things change (and they always do!), and the more likely you are to create bugs over time.
+    
+    Be careful with == for floating point comparisons. Usually you have do something like:
+        abs(x - y) < eps
+    For some small value eps. The all.equal function can be very helpful here.
+    
+Functions are for humans and computers:
+
+    Ideally, the name of your function will be short, but clearly evoke what the function does. It’s better to be clear than short.
+    Generally, function names should be verbs, and arguments should be nouns.
+    
+    Use "snake_case" for function names.
+    If you have a family of functions that do similar things, make sure they have consistent names and arguments. Use a common prefix to indicate that they are connected
+    
+    Where possible, avoid overriding existing functions and variables, especially those from base R.
+    
+    Use comments to explain the why of the code, not the what or how.  The latter two should be apparent on their own when you properly name variables and make your code clear.
+    
+    Use comment headers to section code. (Ctrl + Shift + R) in RStudio.
+    
+Conditional execution:
+
+    if (condition) {
+    # code executed when condition is TRUE
+        } else if (condition2) {
+            # code executed when condition is FALSE
+        } else {
+            # do something else
+        }
+    
+    Conditions:
+    
+        You can use || (or) and && (and) to combine multiple logical expressions. 
+        You should never use | or & in an if statement: these are vectorised operations that apply to multiple values (that’s why you use them in filter()). If you do have a logical vector, you can use any() or all() to collapse it to a single value.
+        
+        equality. == is vectorised, use the non-vectorised identical(); identical() does not coerce types. 
+        
+    Multiple conditions:
+    
+        Use switch() to replace long if-else statements.  use cut to discretise continuous variables.
+        
+        switch(name_to_check,
+            func = do_stuff,
+            func2 = do_other_stuff,
+            func3 = do_even_other_stuff,
+            stop("unkown func")
+        )
+        
+    Code style:
+    
+        An opening curly brace should never go on its own line and should always be followed by a new line. A closing curly brace should always go on its own line, unless it’s followed by else. Always indent the code inside curly braces.
+    
+Function arguments:
+
+    Generally, data arguments (input data) should come first. Detail arguments (control details of computation) should go on the end, and usually should have default values.
+    
+    function(data, detail_1 = 1, detail_2 = 2){
+            whatever
+        }
+    
+    Choosing names:
+        
+        Consider matching names of arguments in existing R functions. For example, use na.rm to determine if missing values should be removed.
+        Otherwise, do what you want.
+        
+    Checking values:
+        
+        To avoid calling your function with invalid inputs, it’s good practice to check important preconditions, and throw an error (with stop()), if they are not true.
+        This is especially important with vector lengths, because of R’s vector recycling rules.
+        
+        stopifnot(): it checks that each argument is TRUE, and produces a generic error message if not.
+        
+    Dot-dot-dot (...)
+    
+        This special argument captures any number of arguments that aren’t otherwise matched.  This is a useful catch-all if your function primarily wraps another function.
+        Misspelled arguments will not be caught by (...)
+    
+        list(...) captures the values of the (...)
+        
+    Lazy evaluation:
+    
+        Arguments in R are lazily evaluated: they’re not computed until they’re needed.
+        
+Return values:
+
+    Always consider:
+        Does returning early make your function easier to read?
+        Can you make your function pipeable?
+    
+    Explicit return statements:
+        
+        return() returns a function earlier than the last line.
+        It’s best to save the use of return() to signal that you can return early with a simpler solution. 
+            e.g. inputs are empty, early return for the simple case in if-else statement.
+    
+    Writing pipeable functions:
+    
+        There are two basic types of pipeable functions: transformations and side-effects.
+        
+        transformations: an object is passed to the function’s first argument and a modified object is returned
+        
+        side-effects: the function performs an action on the object, like drawing a plot or saving a file. Side-effect functions should “invisibly” return the first argument, so that while they’re not printed they can still be used in a pipeline - use the invisible(first_argument) function as the return statement.
+        
+Environment
+
+    The environment of a function controls how R finds the value associated with a name.
+    R uses rules called lexical scoping to find the value associated with a name - R will look in the environment where the function was defined
+    This is the same as scoping rules in C++.

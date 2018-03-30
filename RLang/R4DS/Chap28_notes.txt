@@ -1,0 +1,101 @@
+Chapter 28 Graphics for communication
+
+To help others quickly build up a good mental model of the data, you will need to invest considerable effort in making your plots as self-explanatory as possible.
+
+uses libraries:
+    ggplot2
+    ggrepel
+    viridis
+
+28.2 Label
+
+    Add labels, axis, legends, with labs() function.
+    use quote() to add mathematical equations
+    plotmath - Mathematical Annotation in R
+    
+28.3 Annotations
+
+    to label individual observations or groups of observations - geom_text()
+    same as geom_point, except it has label aesthetic.
+    
+    geom_label() adds rectangle behind the text.  nudg_y parameter moves label.
+    
+    ggrepel package automatically adjusts labels so they don't overlap.
+    
+    You can sometimes use the same idea to replace the legend with labels placed directly on the plot.  theme(legend.position = "none")
+    
+    other stuff here too...
+    
+28.4 Scales
+
+    ggplot2 automatically adds scales for you. adjust for better communication.
+    naming scheme for scales: scale_ followed by the name of the aesthetic, then _, then the name of the scale
+    
+    
+    28.4.1 Axis ticks and legend keys
+
+        Breaks controls the position of the ticks, or the values associated with the keys. Labels controls the text label associated with each tick/key.   
+        
+        date_labels
+        date_breaks
+        
+    28.4.2 Legend layout
+    
+        theme() - controls overall position of the legend + other non-data parts
+        To control the display of individual legends, use guides() along with guide_legend() or guide_colourbar()
+        
+    28.4.3 Replacing a scale
+    
+        There are two types of scales you’re mostly likely to want to switch out: continuous position scales and colour scales
+        
+        It’s very useful to plot transformations of your variable - like plotting the log instead of the actual data, however this will change the scale to that of the transformed values, making it hard to interpret the plot.
+        Instead of transforming the data, you can transform the scale - probably much more efficient.  This is visually identical, except the axes are labelled on the original data scale.
+                - scale_x_log10()
+                
+        use RColorBrewer for color-blindness. Or change the shapes so it's still useful in black and white.
+        
+        
+        sequential and diverging color paletts are useful for categorical values - or quantiled data.
+        
+        For continuous colour - scale_colour_gradient() or scale_fill_gradient()
+            diverging  - scale_color_gradient2() - above/below mean
+            
+        viridis::scale_colour_viridis() is a continuous analog of the categorical ColorBrewer scales, with good perceptual properties
+            
+            
+28.5 Zooming
+
+    There are three ways to control the plot limits:
+
+        Adjusting what data are plotted - use filter then plot
+        Setting the limits in each scale - useful if you want to expand the limits to match across different plots, or share scales
+        Setting xlim and ylim in coord_cartesian(xlim = c(x1,x2), ylim = c(y1,y2)) - generally best for zooming
+        
+28.6 Themes
+
+    to cutomize non-data elements.
+    use ggthemes for extra themes
+    It’s also possible to control individual components of each theme, like the size and colour of the font used for the y axis.
+    
+    create your own themes, if you are trying to match a particular corporate or journal style
+    
+28.7 Saving your plots
+
+    ggsave("my_plot.pdf", width, height) - saves most current plot to disk
+    or use knitr
+   
+    28.7.1 Figure sizing
+    
+        used in RMarkdown
+        Image sizing is challenging because there are two sizes (the size of the figure created by R and the size at which it is inserted in the output document), and multiple ways of specifying the size (i.e., height, width, and aspect ratio: pick two of three).
+        
+        look here for suggested parameters
+            
+    28.7.2 Other important options
+        
+        fig.show = "hold" - plots are shown after the code
+        To add a caption to the plot, use fig.cap
+        
+        set ggsave(device = "png") when displaying many data points in PDF - less comp expensive
+        
+    

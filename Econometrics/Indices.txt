@@ -1,0 +1,19 @@
+Comparing Indicies
+
+Indices are always percent change from one period to another.
+If you want to compare indices in their original form you need to change the base years. If you want to compare relative rates of growth (the second derivative) then I don't hink you need to.
+
+
+Simple Index
+    ratio of two variables and that ratio converted to a percentage.  Always like units.
+
+Value Index
+    Price and Quantity for both base and current years.
+    
+
+Price Index
+
+Yield Index
+
+
+

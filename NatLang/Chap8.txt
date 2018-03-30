@@ -1,0 +1,179 @@
+Chapter 8: Analyzing Sentence Structure
+
+    We need to deal with ambiguity in natural language.  We need to analyze infinite sentences with finite programs.
+    
+    The goal of this chapter is to answer the following questions:
+
+        How can we use a formal grammar to describe the structure of an unlimited set of sentences?
+        How do we represent the structure of sentences using syntax trees?
+        How do parsers analyze a sentence and automatically build a syntax tree?
+    
+8.1   Some Grammatical Dilemmas
+
+    Linguistic Data and Unlimited Possibilities:
+    
+        Sentences can be embeded inside larger Sentences
+            e.g. SentenceC = SentenceA, but SentenceB
+                 SentenceC = SentenceA, when SentenceB
+                 
+        "generative grammar", in which a "language" is considered to be nothing more than an enormous collection of all grammatical sentences, and a grammar is a formal notation that can be used for "generating" the members of this set. Grammars use recursive productions of the form S = S and S.
+    
+    Ubiquitous Ambiguity:
+    
+        There can be ambiguity in a sentence, even if there is no ambiguity in the meaning of the constituent words, because the structure of the sentence causes ambiguity in the phrases that make up the sentence.
+        Patterns of well-formedness and ill-formedness in a sequence of words can be understood with respect to the phrase structure and dependencies.
+        We can develop formal models of these structures using grammars and parsers.
+       
+8.2   What's the Use of Syntax?
+
+    Beyond n-grams:
+               
+        coordinate structure, where two phrases are joined by a coordinating conjunction such as and, but or or. If v1 and v2 are both phrases of grammatical category X, then v1 and v2 is also a phrase of category X.
+        Constituent structure is based on the observation that words combine with other words to form units.  evidence that a sequence of words forms a unit is given by substitutability - phrase can be replaced by shorter sequence without destroying meaning.
+        
+        You can reduce sentences by substituting units using a grammar (grammar tags) with single words.
+        
+8.3   Context Free Grammar
+
+    A Simple Grammar:
+        
+        use nltk.parse_cfg(grammar_structure) to parse context free grammar. This is essentially a symbol table that relates form-units with it's smaller sequences.
+        nltk.RecursiveDescentParser(nltk.parse_cfg(grammar_structure)) to create a sentence parsing function, that will return a grammar tree
+        If more than one tree is produced the sentence is Structuarally Ambiguous - the sentence could have multiple meanings based on phrasing.
+        
+    Syntactic Categories:
+        Symbol	Meaning	
+        S	    sentence	
+        NP	    noun phrase
+        VP  	verb phrase
+        PP	    prepositional phrase
+        Det	    determiner
+        N	    noun
+        V   	verb
+        P	    preposition
+        
+    Writing Your Own Grammars:
+        
+        you can create and edit your own grammar in a text file (grammar_file.cfg) and then load it into nltk.data.load('file:grammar_file.cfg')
+        cannot combine grammatical categories with lexical items on the righthand side of the same production, not place Multi-word lexical items on righthand side of production.
+        
+    Recursion in Syntactic Structure:
+    
+        Grammar is recursive if a category occurring on the left hand side of a production also appears on the righthand side of a production.
+            e.g. S  -> NP VP
+                 VP ->  V S 
+        No limit to recusrsion depth.  RecursiveDescentParser is unable to handle left-recursive productions of the form X -> X Y.
+    
+8.4   Parsing With Context Free Grammar
+    
+    Simple parsing methods:
+        Recursive Descent Parsing - Top-down
+        Shift-Reduce Parsing - Bottom-up
+    
+    Sophisticated parsing methods:
+        Left-corner Parsing - top-down with bottom-up filtering
+        Chart Parsing - dynamic programming technique
+
+    Recursive Descent Parsing:
+        
+        RecursiveDescentParser(input, trace=1)
+    
+        Interprets a grammar as a specification of how to break a high-level goal into several lower-level subgoals, then recursively applies it to the sub goals. If no match the parser backs up and tries an alternative. Constructs a Right leaning tree, that extends downward.
+             - nltk.app.rdparser() - graphical demonstration
+        
+        Shortcomings:
+            Left-recursive productions result in infinite loops
+            Wastes time considering words and structures that do not correspond to the input sentence
+            Discards, then rebuilds constituents, when trying alternatives.
+        
+        Top-down parsers use a grammar to predict what the input will be, before inspecting the input - good if you don't have the full input, bad if you have it already.
+    
+    Shift-Reduce Parsing:
+    
+        ShiftReduceParser(ParsingGrammar, trace=2)
+        
+        Tries to find sequences of words and phrases that correspond to the right hand side of a grammar production, and replace them with the left-hand side, until the whole sentence is reduced to an S.
+        
+        Uses a Stack data structure: pushes intput onto the stack. Pulls off the stack when it matches a right hand grammar pattern, aned pushes the left-hand form-unit onto the stack.
+       
+        
+        Shortcomings:
+            Can reach a dead end and fail to find any parse, even if the input sentence is well-formed according to the grammar - the problem arises because there are choices made earlier that cannot be undone by the parser.
+            
+             There are two kinds of choices to be made by the parser: (a) which reduction to do when more than one is possible (b) whether to shift or reduce when either action is possible. - A shift-reduce parser may be extended to implement policies for resolving such conflicts.
+             
+        Advantage over Recursive Descent:
+            Only build structure that corresponds to the words in the input, and only build each substructure once.
+             
+             
+    The Left-Corner Parser:
+        
+        A left-corner parser is a hybrid between the bottom-up and top-down approaches.
+        Does not get trapped in left recursive productions.
+        Preprocesses the context-free grammar to build a table where each row contains two cells, the first holding a non-terminal, and the second holding the collection of possible left corners of that non-terminal
+        Each time a production is considered by the parser, it checks that the next input word is compatible with at least one of the pre-terminal categories in the left-corner table. - Prevents dead-ends.
+        
+    Chart-Parsing/Well-Formed Substring Tables:
+    
+        Chart-Parsing uses dynamic programming (memoization) to store intermediate results and re-uses them when appropriate, achieving significant efficiency gains because it only builds units once and stores them in a well-formed substring table (WFST), then looks them up when needed.
+        The Chart data structure is like a linear Graph, with the words as edge labels.
+        In a WFST, we record the position of the words by filling in cells in a triangular matrix: the vertical axis will denote the start position of a substring, while the horizontal axis will denote the end position - can store lexical category (instead of word) in the matrix. String a(i) is placed in coordinate (i-1, i)
+        
+        For our WFST, we create an (n-1) × (n-1) matrix as a list of lists in Python, and initialize it with the lexical categories of each token.
+        
+        We can enter A in (i, j) if there is a production A → B C, and we find nonterminal B in (i, k) and C in (k, j).
+        
+        Shortcomings:
+        
+            Technique is recognizing that a sentence is admitted by a grammar than actually parsing.
+            It requires every non-lexical grammar production to be binary - possible to turn CFGs into this form.
+            As a bottom-up approach it is potentially wasteful, being able to propose constituents in locations that would not be licensed by the grammar
+           WFST did not represent the structural ambiguity in the sentence.
+        
+8.5   Dependencies and Dependency Grammar:
+    
+    Dependency grammar, focusses on how words relate to other words. Dependency is a binary asymmetric relation that holds between a head and its dependents.  The head of a sentence is usually taken to be the tensed verb, and every other word is either dependent on the sentence head, or connects to it through a path of dependencies.
+    Dependency representation is a labeled directed graph - nodes are lexical items and edges are dependency relations.
+    
+    A dependency graph is projective if, when all the words are written in linear order, the edges can be drawn above the words without crossing - word and all its descendents (dependents and dependents of its dependents, etc.) form a contiguous sequence of words within the sentence.
+    
+   Valency and the Lexicon:
+    
+        Complements of a Head are the interchangable Dependents it may have.  The Valency of a Head is the Complement Dependencies it may have.
+        Adding grammar restrictions based on Valency allows for the partial elimination of ill-formed sentences. This is accomplished through subcategorizing Heads based on Valency.
+    
+    Scaling Up:
+        
+        It's difficult to scale up Grammar parsing because interactions of language are too complex, and it's difficult to distribute the task of grammar writing because of the interdependency of grammar -- Ambiguity Increases with Coverage.
+        
+        Attempts at rule-based Grammer:
+            Lexical Functional Grammar (LFG) Pargram project, the Head-Driven Phrase Structure Grammar (HPSG) LinGO Matrix framework, and the Lexicalized Tree Adjoining Grammar XTAG Project
+            
+8.6   Grammar Development:
+    
+    How to access treebanks, and look at the challenge of developing broad-coverage grammars.
+    
+    Treebanks and Grammars:
+    
+        Can use data in treebanks to develop a grammar - use a simple filter to find Heads with a certain complement.
+        
+        The Prepositional Phrase Attachment Corpus, nltk.corpus.ppattach is another source of information about the valency of particular verbs.
+            -   useful for determining dependency of Prepositional Phrases
+        
+    A collection of larger grammars has been prepared for the purpose of comparing different parsers - 
+        $ python -m nltk.downloader large_grammars
+        
+    Pernicious Ambiguity:
+    
+        The number of parse trees grows faster than grammar coverage.
+        to construct a broad-coverage grammar, we are forced to make lexical entries highly ambiguous for their part of speech - the parser will be overwhelmed by ambiguity.
+        The solution to these problems is provided by probabilistic parsing, which allows us to rank the parses of an ambiguous sentence on the basis of evidence from corpora.
+    
+    Weighted Grammar:
+        
+        The notion of grammaticality could be gradient because although there are general propensities in Valencies, they are not absolute rules.
+        A probabilistic context free grammar (PCFG) - context free grammar that associates a probability with each of its productions. Generates the same set of parses as the CFG does, and assigns a probability to each parse. The probability of a parse generated by a PCFG is the product of the probabilities of the productions used to generate it.
+        You just add a bracketed weight to the grammar.
+            e.g.    S    -> NP VP              [1.0]
+                    VP -> TV NP [0.4] | IV [0.3] | DatV NP NP [0.3]
+        PCFG grammars impose the constraint that all productions with a given left-hand side must have probabilities that sum to one.

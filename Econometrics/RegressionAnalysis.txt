@@ -1,0 +1,40 @@
+Simple Regression Analysis
+
+Establish if the five assumptions of the classical regression model (OLS) are present.
+
+Make scatter plot of X and Y values to see visual relationship.
+Estimate the regerssion equation.
+
+Provide the predicted values.
+Provide the standard errors of the estimates.
+
+Are residuals and standard errors the same?
+
+Plot residuals to see if there is still a strong linear pattern.
+
+Test the statistical significance (at whatever confidence level) of the parameter estimates of the regression - ANOVA tests(?). The null hypothesis is that there is no relationship between the parameter and the target variable based on the coefficient (i.e. that the parameter coefficient = 0).
+
+Construct the (90, 95, 99) confident intervals for the parameters.
+
+Run goodness of fit tests:
+    R-Squared - the proportion of the total variation in Y "explained" by the regression of Y on X
+    correlation coefficient(s) - linear correlation - does not imply causality or dependence - correlation analysis is a much less powerful tool than regression analysis and is seldom used by itself in the real world. correlation analysis is to determine the degree of association found in regression analysis - geven by coefficient of determination = square of correlation coefficient
+    For Qualitative data:
+        rank or spearman correlation coefficient. Rank correlation is used with qualitative data such as profession, education, or sex, when, because of the absence of numerical values, the coefficient of correlation cannot be found. Rank correlation also is used when precise values for all or some of the variables are not available (so that, once again, the coefficient of correlation cannot be found).
+
+Provide standard summary form.
+
+Notes:
+
+OLS estimators are the best among all unbiased linear estimators.
+An estimator is consistent if, as the sample size approaches infinity in the limit, its value approaches the true parameter (i.e., it is asymptotically unbiased) and its distribution collapses on the true parameter.
+
+To compare the bias of estimators, compare (plot) the probability distribution of the sampling distribution of the parameter mean. The estimator with the most compact or least spread-out distribution is the one you want.  an efficient estimator has the smallest confidence interval and is more likely to be statistically significant than any other estimator. minimum variance by itself is not very important, unless coupled with the lack of bias.
+
+nonlinear estimators may be superior to the OLS estimator (i.e., they might be unbiased and have lower variance). Since it is often difficult or impossible to find the variance of unbiased nonlinear estimators.
+
+
+The rule to minimize the MSE arises when the researcher faces a slightly biased estimator but with a smaller variance than any unbiased estimator. The researcher is then likely to choose the estimator with the lowest MSE. This rule penalizes equally for the larger variance or for the square of the bias of an estimator. However, this is used only when the OLS estimator has an "unacceptably large" variance.
+
+
+

@@ -1,0 +1,29 @@
+Chapter 24 Model Building
+    this chap is just kinda modeling examples
+
+
+think about a model partitioning your data into pattern and residuals. Find patterns with visualization, then make the concrete and precise with a model
+
+
+repeat the process, but replace the old response variable with the residuals from the model. The goal is to transition from implicit knowledge in the data and your head to explicit knowledge in a quantitative model
+
+
+Confounding Variables:
+    remove confounding variables so you can isolate other relationships in data.
+    Use log-transformation to make a pattern linear, if it is not, since linear patterns are the easiest to work with.
+    To remove the strong linear pattern:
+        Make the pattern explicit by fitting a model.
+        Look at what the model tells us about the data.  If you undo the log transformation, you can overlay the predictions on the raw data.
+        Look at the residuals to see that you've removed the strong linear pattern. Use the residual instead of the confounded dependent variable.
+
+
+When plotting a model of multiple independent variable, you can use the .model argument to data_grid. If the model needs variables that you haven’t explicitly supplied, data_grid() will automatically fill them in with "typical" value. 
+
+
+If you’re experimenting with many models and many visualisations, it’s a good idea to bundle the creation of variables up into a function so there’s no chance of accidentally applying a different transformation in different places.
+
+
+Another option is to put the transformations directly in the model formula.
+
+
+Including the transformations in the model function makes life a little easier when you’re working with many different datasets because the model is self contained.

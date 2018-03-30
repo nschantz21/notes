@@ -1,0 +1,163 @@
+Data Science Work Flow
+
+1.  Ask an interesting question
+
+    Phrase as a hypothesis - maybe too early in the steps to do that.
+    Is the question too broad or too narrow?
+    Define a success measure.
+    What is the information going to be used for?
+    
+2.  Examine Previous Work
+    
+    Research completed by us or external groups - whether it supports or not.
+    Cite work and provide links to that work.
+    Set up knowledge repo.
+    
+3.  Get the Data
+    
+    Find/document appropriate data source.
+    Transform data into a regular format that can be converted into SQL tables
+    Make script to automate recreation of data from SQL DB.
+    
+    Preliminary Data Analysis - clean data and generate reports - output notebook with quick overview of data and some stats. All documents stored in Github repo.
+    
+    
+4.  Explore the Data
+
+    Command Line then set up data directory - cookie cutter
+    save all the raw data as well
+    downsample data to quickly prototype
+    
+    Descriptive statistics and visualizations should be done at this point.
+    
+    Notebook with all exploratory analysis steps executed, results, conclusions drawn, problems found, notes for reference, and so on.
+    
+5.  Model the Data
+
+    The needs of the business users of the final models are also important when it comes to deciding what to optimize.  This would be decided by the success measure in Step 1.
+    Independent model validation and comparison.
+    
+    All the steps, choosing most relevant features, the best algorithm, and parameter values, are performed manually.  
+    
+
+6.  Test
+    
+    Test for accuracy: 
+        downsamples the original test set. A first small downsample is used to iterate quickly on models, and then a second downsample consisting of 1 to 10 percent of the dataset is used to test with some statistical accuracy the quality of those models. Only when a model is already working well is it tested on the full dataset.
+    
+    Test for user experience:
+        Make sure the output makes sense to the audience consuming the report.
+        
+7.  Document the Code
+
+    Document Working solutions and dead-ends as well.
+    
+8.  Deploy to production
+
+    Automated deployment system. Allows for model deployment as fast as idea generation.
+    Requires infratructure
+    Development environment for making new models. Production is for deploying them.
+    use a standard gitflow to version all changes to the models and to the environment so that they are fully auditable. Plug the most promising models into the production pipeline.
+
+9.  Communicate the Results
+
+    Explain the outputs of the model in a way the audience can understand.
+    Make sure the model is something that people can use and not too complicated
+    
+    Stay away from "black box" terminology
+    
+    build prototype, collect feedback and iterate on the whole thing. get comments to issues as they arise - kinda like an AGILE software dev cycle.
+    
+    Visualization:
+        Plotly for dashboards and interactive plots, Matplotlib when the output is a Jupyter notebook report, and Illustrator when more sophisticated design is needed.
+        
+        
+Descriptive Stats and Visualizations in Exploratory Data Analysis depend on the nature of the data
+
+    Kernel Density Estimate
+    
+    
+    Continuous:
+        Single:
+        Multiple:
+    
+    Categrical:
+        Single Variable:
+        Multiple Variable:
+    
+    Proportion:
+        Sample Size
+    
+    MAGIC Criteria of Statistical Analysis
+        Magnitude - How big is the effect?
+        Articulation - How readily can the details be summarized into memorable principles?
+        Generality - How widely does this conclusion apply?
+        Interestingness - How important is the issue addressed?
+        Credibility - Given the methods used to gather the and analyze the data, how much should we trust the results?
+    
+    std
+    
+    variance
+    
+    Power - The power of a binary hypothesis test is the probability that the test correctly rejects the null hypothesis (H0) when a specific alternative hypothesis (H1) is true.
+    
+    Statistical Significance - α, is the probability of the study rejecting the null hypothesis, given that it were true;[4] and the p-value of a result, p, is the probability of obtaining a result at least as extreme, given that the null hypothesis were true
+    
+    Practical Significance/Effect Size and Standard Error of Effect Size - measure of the strength of a phenomenon.
+    
+    Variance of means between samples
+    
+    
+    F1 Score for binary classification
+    Precision - how close estimates from different samples are to each other. maybe not necessary if we have standard error
+    
+    Fowlkes-Mallows for Clustering
+    
+    Sample Size:
+        Standard Error
+        Confidence Interval
+        Statistical Power
+        Alpha
+    
+    Appropriate Sample size - dependent on type of sampling and distribution
+    
+        Stratified Sampling - optimal allocation
+        Proportional  - unit width
+    
+    Fisher's Method - used to combine the results from several independent tests bearing upon the same overall hypothesis (H0).   Fisher's method is typically applied to a collection of independent test statistics, usually from separate studies having the same null hypothesis. The meta-analysis null hypothesis is that all of the separate null hypotheses are true. The meta-analysis alternative hypothesis is that at least one of the separate alternative hypotheses is true.
+    
+    Inherent Variablility - The variance of that estimate is proportional to the inherent variability of the population divided by the sample size
+    Practibility - Quantify risks with sample size - determine the confidence interval
+    
+    
+    
+    Determining Sample Size:
+        Population Size
+        Margin of Error (Confidence Interval)
+        Confidence Level - how confident that the actual mean falls within your confidence interval
+        Standard Deviation - How much variance do you expect in your response
+        Determine the standard error; determine basic sample size; apply Finite Population Correction factor
+        
+
+    column-wise metrics - one for each varible
+    
+    
+
+Model Performance:
+    Utility Function - measure of how good model is
+    Cost Function - measure how bad a model is
+    Dickey-Fuller Test
+    for linear regression - Fstat and Wald Statistic
+    Wald Test - Whenever a relationship within or between data items can be expressed as a statistical model with parameters to be estimated from a sample, the Wald test can be used to test the true value of the parameter based on the sample estimate.
+    
+
+
+Chi-Square - goodness of fit -  Comparing the distribution of one categorical variable with more than 2 levels to a hypothesized distribution
+Chi-Square - Independence test - evaluating the relationship between two categorical variables, where at least one has more than two levels
+
+ICPSPR
+OpenICPSR
+
+The Durbin Watson statistic is a number that tests for autocorrelation in the residuals from a statistical regression analysis. The Durbin-Watson statistic is always between 0 and 4. A value of 2 means that there is no autocorrelation in the sample.
+
+How large does dataset need to be to avoid sampling bias in random sampling? If the dataset is not large enough, use stratified sampling.

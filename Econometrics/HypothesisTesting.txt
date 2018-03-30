@@ -1,0 +1,69 @@
+Testing hypotheses about population characteristics.  Make an assumption with regard to an unknown population characteristic. We then take a random sample from the population, and on the basis of the corresponding sample characteristic, we either accept or reject the hypothesis with a particular degree of confidence.
+
+Type I Error: False Negative
+Type II Error: False Positive
+
+Level of Significance - probability of rejecting a true hypothesis or committing type I error
+Level of Confidence - probability of accepting a true hypothesis
+
+We can control or determine the probability of making a type I error, alpha. However, by reducing alpha, we will have to accept a greater probability of making a type II error, Beta, unless the sample size is increased. Alpha is called the level of significance, and 1 - alpha is the level of confidence of the test.
+
+Steps:
+    Determine the Hypothesis/Alternative Hypothesis
+    What is the type of test (one-tail vs two-tail)
+    What is the distribution (normal, binomial, Poisson)
+    Decide on level of significance
+        define acceptance/rejection regions based on distribution
+    Take Random Sample of population
+        Stratified, Shuffled, Clustered
+    Reject or Accept Hypothesis based on Sample, distribution, and Significance lvl
+    Provide Probability of Type I and Type II errors based on distribution of parameter estimation
+    Create The operating-characteristic (OC) and Power Curves.
+        OC - how how changes in the sample size affect the probability of making a type II error
+        Power - probability of correctly failing to reject the tested null hypothesis - Type II error
+    Determine Statistical and Practical significance of findings
+
+5.4 CHI-SQUARE TEST OF GOODNESS OF FIT AND INDEPENDENCE
+
+    Use chi-square to test:
+        The observed frequencies differ "significantly" from expected frequencies when more than two outcomes are possible
+        The sampled distribution is binomial, normal, or other
+        Two variables are independent
+    
+    The default null Hypothesis is there is no relation between categories.
+    
+    
+    use a correction for continuity when df = 1 but n < 50.
+
+5.5 ANALYSIS OF VARIANCE
+
+    The analysis of variance is used to test the null hypothesis that the means of two or more populations are equal versus the alternative that at least one of the means is different. The populations are assumed to be independently normally distributed, and of equal variance.
+    
+    Steps:
+        Estimate the population variance from the variance between the sample means
+        Estimate the population variance from the variance within the samples
+        Compute the F ratio
+        Reject or accept null hypothesis based on F ratio, sig lvl, and df.
+        
+    Make Analysis of Variance (ANOVA) table.
+        find the value of SSA, SSE, and SST; the degrees of freedom for SSA, SSE, and SST; and MSA, MSE, and the F ratio
+        variance between the means
+        variance between the samples
+        Total
+        
+    The ANOVA will tell us if there is a significant difference between groups. If there isn't we can view all the samples as coming from the same population.
+    
+    
+5.6 NONPARAMETRIC TESTING
+
+    Nonparametric testing is used when one or more of the assumptions of the previous tests have not been met. Usually the assumption in question is the normality of the distribution (distribution of the data is unknown or the sample size is small). Nonparametric tests are often based on counting techniques that are easier to calculate and may be used for ordinal as well as quantitative data. These tests are inefficient if the distribution is known or the sample is large enough for a parametric test.
+    
+    Also, the nonparametric goodness-of-fit test does not have the researcher choose class intervals to compare observed and expected values. The chi-square goodness-of-fit test is often not robust to changes in class specifications. The disadvantages of a nonparametric test focus around the loss of information. Nonparametric tests are based on counting rules, such as ranking, and therefore summarize magnitudes into a rank statistic. This only uses the relative position of values. If the standard assumptions hold, a parametric test will be more efficient, and therefore more powerful, for a given data set.
+    
+    to test a hypothesis about the median of a population
+        Wilcox signed rank test
+    to test equality of medians of more than two samples (analogous to ANOVA, but no assumption of normality)
+        Kruskal-Wallis test
+    test of goodness of fit
+        Kolmogorov-Smirnov test
+    

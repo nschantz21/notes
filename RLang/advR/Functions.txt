@@ -1,0 +1,121 @@
+Functions
+
+Function components:
+
+    All R functions have three parts:
+        the body(), the code inside the function.
+        the formals(), the list of arguments which controls how you can call the function.
+        the environment(), the “map” of the location of the function’s variables
+        
+    other attributes:
+        srcref() - source reference -  points to the source code used to create the function - contains comments and other formatting
+        you can also set the class and custom print methods
+        
+    Primitive funcitons:
+        
+        functions that call C code directly and have no R code, do not contain the above three components.
+        Primitive functions are only found in the base package, and since they operate at a low level, they can be more efficient (primitive replacement functions don’t have to make copies), and can have different rules for argument matching (e.g., switch and call)
+    
+Lexical Scoping
+
+    R has two types of scoping: lexical scoping, implemented automatically at the language level, and dynamic scoping, used in select functions to save typing during interactive analysis.
+    
+    Name Masking
+    
+        Same as C++ scoping. Looks to local namespace, then enclosing scope, up to the global namespace, then to other loaded packages until it find the name, then it stops looking.
+    
+    Functions vs. variables
+    
+        scoping is the same for functions and variables.  When calling a function (passing arguments etc) R will ignore objects that are not functions
+        Don't name your functions the same as variables.
+        
+    A fresh start
+    
+        every time a function is called, a new environment is created to host execution. varibles will not persist once the scope of that variable is exited - kinda automatic garbage collection.
+        
+    Dynamic lookup
+
+        R looks for values when the function is run, not when it’s created - lazy assignment. This can be problematic when dealing with external variables that have been changed or are dynamically created.
+        codetools::findGlobals() lists all the external dependencies of a function. emptyenv() - an environment that contains nothing - this is a bad idea, since it won't even contain base R operators.
+    
+Every operation is a function call
+
+    All operators and enclosures are functions ({[+-*/%, etc.
+    The backtick (`), lets you refer to functions or variables that have otherwise reserved or illegal names as variables/function names.
+    This allows you to overwrite the definitions of these special functions - useful creating domain specific languages that allow you to concisely express new concepts using existing R constructs.
+    
+Function arguments
+
+    Calling functions:
+        
+        When calling a function you can specify arguments by position, by complete name, or by partial name. Arguments are matched first by exact name (perfect matching), then by prefix matching, and finally by position.
+        Generally, you only want to use positional matching for the first one or two argument. avoid positioning for less commonly used arguments, don't use partial names.  Named arguments should always come after unnamed arguments.  You can only specify arguments listed after ... with their full name.
+        
+    Calling a function given a list of arguments:
+    
+        use do.call(function, argument_list)
+        
+    Default and missing arguments:
+        
+        default assignment is same as python - '='
+        Since arguments in R are evaluated lazily, the default value can be defined in terms of other arguments.
+        You can determine if an argument was supplied or not with the missing() function.
+        
+        You can use missing() to conditionally set a computationally complicated or expensive default value - or set the default value to NULL and use is.null() as the condition.
+        
+    Lazy evaluation:
+    
+        function arguments are only evaluated if actually used.
+        force() - ensure argument is evaluted - important when creating closures with lapply() or a loop.
+        functions passed as defualt arguments of another function are evaluated inside the function, not the global scope.
+        
+        Promise - an unevaluated argument. Has two parts: The expression which gives rise to the delayed computation and the environment where the expression was created/where it should be evaluated.
+        
+        The first time a promise is accessed the expression is evaluated in the environment where it was created. This value is cached, so that subsequent access to the evaluated promise does not recompute the value.
+        pryr::promise_info() - find out more info about a promise without evaluating it - not possible in R, so it uses C++
+        
+        The use of ... allows for very flexible function creation - especially useful in wrapping functions - but requires you to carefully read the documentation and possibly source code.
+        To capture ... in a form that is easier to work with, you can use list(...) - a named list is more explicit and easier to work with.
+        in ... any mispelled arguments will not raise an error, and any arguments after ... must be fully named
+        
+        
+Special calls
+
+    Infix functions:
+        
+        unary and binary functions - like operators.
+        All user-created infix functions must start and end with %.
+        when creating the function, or calling like a regular function with arguments (not as an operator), you have to put the name in backticks because it’s a special name.
+        
+        The names of infix functions can contain any sequence of characters except '%', and you will need to use escape characters for special characters.
+    
+    Replacement functions:
+    
+        Replacement functions act like they modify their arguments in place, and have the special name xxx<-.  They typically have two arguments (x and value), although they can have more, and they must return the modified object.
+        It's for inpalce modification, but it creates a modified copy and reassigns the name.
+        use pryr::address() to find the memory address of the underlying object.
+        Primitive() functions will modify in place.  It’s often useful to combine replacement and subsetting.
+        Replacement creates a local variable named *tmp*, which is removed afterwards.
+        
+Return values
+
+    reserve the use of an explicit return() for when you are returning early.
+    
+    pure functions: functions that always map the same input to the same output and have no other impact on the workspace.  R protects you from one type of side effect: most R objects have copy-on-modify semantic. Modifying a function argument does not change the original value.
+    environments and reference classes can be modified in place.
+    
+    minimize the use of side effects. Pure functions are easier to test (because all you need to worry about are the input values and the output), and are less likely to work differently on different versions of R or on different platforms.
+    
+    return invisible() in a function to not print out by default.  You can force an invisible value to be displayed by wrapping the function in parentheses when you call it.
+    
+On exit
+
+    on.exit() - set triggers to occur when the function is finishing.  often used as a way to guarantee that changes to the global state are restored when the function exits
+    
+    basic pattern:
+        set the directory to a new location, capturing the current location from the output of setwd()
+        use on.exit() to ensure that the working directory is returned to the previous value regardless of how the function exits
+        explicitly force evaluation of the code
+        
+    if using multiple on.exit() calls within a function, set add=TRUE.
+    This allows you to add expr to be executed after any previously set expressions; otherwise (the default) expr will overwrite any previously set expressions.

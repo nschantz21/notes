@@ -1,0 +1,100 @@
+Use the ggplot for guide to visualizations based on nature of data sets
+I think it's only going to be Time-series info and cross-sectional data
+
+Visualize Correlations of Raw Attributes
+
+Attribute Combinations
+    this part requires subject familiarity and should probably be accompanied by some notes on the subject
+
+Schaum's
+Measures of Central Tendency
+    The most important measures of central tendency are (1) the mean, (2) the median, and (3) the mode.
+    For populations and samples
+    For grouped and ungrouped data
+
+    weighted mean, the geometric mean, and the harmonic mean
+
+    geometric mean - average rates of change and index numbers
+    harmonic mean - avg of ratios
+    quantiles - grouped and ungrouped
+
+Measures of Dispersion - For sample, population, grouped, ungrouped
+
+    Mean Average Deviation (MAD)
+    Variance
+    Standard Deviation
+    range - useful in quality control
+    Cumulative Distribution Function
+    Probability Distribution Function
+    interquantile range - not affected by extreme values
+    Quantile Range - measures average range of each quantile
+    Coefficient of Variation - for relative dispersion - the coefficient of variation can be used to compare the relative dispersion of two or more distributions expressed in different units, as well as when the true mean values differ. Also can be used to compare the relative dispersion of the same type of data over different time periods.
+
+Shape of Frequency Distributions
+    skewness - Pearson Coefficient of Skewness
+    kurtosis
+    Covariance if two variables
+
+Visualizations
+    Frequency
+    Relative Frequency - groups
+    Frequency Polygon
+    Ogive - cumulative frequency distribution - graphs that can be used to determine how many data values lie above or below a particular value in a data set. The cumulative frequency is calculated from a frequency table, by adding each frequency to the total of the frequencies of all data values before it in the data set. The last value for the cumulative frequency will always be equal to the total number of data values, since all frequencies will already have been added to the previous total.
+
+Probability Characteristics
+     Mutually Exclusive or not - Venn Diagram
+     Independent or not
+     Probability Distribution
+          Classical/Relative/Empirical Frequency
+          Discrete Independent Outcomes
+
+               Binomial - to find the probability of X number of occurrences or successes of an event, P(X), in n trials of the same experiment when (1) there are only 2 mutually exclusive outcomes, (2) the n trials are independent, and (3) the probability of occurrence or success, p, remains constant in each trial.
+               
+               hypergeometric distribution - Finite population without replacement - the binomial distribution (which is easier to use) is a good approximation for the hypergeometric distribution
+               
+               Poisson - the Poisson distribution is used to find the probability of a designated number of successes per unit of time. Can be used to estimate the binomial distribution when the sample size is large and the prob of one of the outcomes is small - just easier than binomial in that case.
+
+          Continuous
+               Normal
+                    probability density function
+                    Can be used to approximate other distributions - Distributions of sample means and proportions are often normal, even if the parent distribution is not
+
+               Exponential - If events or successes follow a Poisson distribution, we can determine the probability that the first event occurs within a designated period of time, by the exponential probability distribution.  The exponential distribution also can be used to calculate the time between two successive events.
+
+    Symmetry or Asymmetry of Prob Distro
+    You can use Chebyshev's Theorem for prob of random sample even if population distribution is unknown.
+
+
+Analysis of Financial Time Series - Tsay
+    This is for analysis of asset returns - assumes dividend payments, if any, are included in returns
+    Moments of Continuous Distribution
+        First Moment - measures the central location of the distribution - Mean/Expectation of X
+        Second Moment - Measures Variability of X - Variance
+        Third Moment - Measures Symmetry of X with respect to its mean - skewness
+        Fourth Moment - Measures Tail Behavior of X - kurtosis
+
+    Excess Kurtosis - Kurtosis(X) - 3
+    Hypothesis test for normality of asset returns  - Sample skewness and sample kurtosis - p10
+    JB Statistic combines the two
+
+Descriptive (Summary) Statistics for Simple and Log returns of Indexes and Stocks - Group by Time interval - e.g. daily, monthly
+    Start Date
+    Size - number of instances
+    Mean
+    Std
+    Skewness
+    Skew t-stat - look this up
+    Excess Kurtosis
+    Kurtosis t-stat - look this up
+    Minimum Value
+    Maximum Value
+    
+Distribution of Returns - what type of distribution should you assume
+    Different Distributional specifications lead to different theories
+    Conditional Distribution - Inter-temporal distribution
+    Marginal Distribution
+        Normal
+        log normal isn't bad
+        Scale Mixture of Normal Distributions - Advantages of mixtures of normal include that they maintain the tractability of normal, have  finite higher order moments, and can capture the excess kurtosis. Yet it is hard to estimate the mixture parameters - uses Bernoulli random variable
+
+    Use Multivariate  normal distribution for the cross-sectional log returns of multiple assets in a time series

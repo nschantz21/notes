@@ -1,0 +1,96 @@
+Data Wrangling: Clean, Transform, Merge, Reshape
+
+Combining and Merging Data Sets
+    
+    pandas.merge connects rows in DataFrames based on one or more keys
+    pandas.concat glues or stacks together objects along an axis.
+    combine_first instance method enables splicing together overlapping data to fill in missing values in one object with values from another.
+    
+    merge uses the overlapping column names as the keys.
+    pd.merge(df1, df2, on='key', how='inner')
+    
+    with overlapping column names, merge has a suffixes option for specifying strings to append to overlapping names in the left and right DataFrame objects
+    you can pass left_index=True or right_index=True (or both) to indicate that the index should be used as the merge key
+    
+    use DataFrame.join() method for joining on index. can join multiple DFs
+    
+Concatenating Along an Axis
+
+    a lot like the join method. defaults to outer join when combining columns
+    pandas.concat(list_of_dfs, method_of_concat)
+    works for multi-indexed frames as well., you just have to specify how the hierarchical index is created.
+    You can also ignore the horizontal index if it doesn't matter with the ignore_index = True argument.
+    
+    
+Combining Data with Overlap
+
+    use the combine_first method when you have two datasets whose indexes overlap in full or part.
+    It utilizes a vectorized if-else function with alignment between the two data sets based on index.
+    you can think of it as "patching" missing data in the calling object with data from the object you pass.
+    
+    a’s values prioritized, use values from b to fill holes
+        a.combine_first(b)
+        
+Reshaping and Pivoting
+
+    stack: this "rotates" or pivots from the columns in the data to the rows
+    unstack: this pivots from the rows into the columns
+    
+    By default the innermost level is unstacked (same with stack). You can unstack a different level by passing a level number or name
+    
+    good for manipulating multi-indices.
+    
+Pivoting "long" to "wide" Format
+    
+    DataFrame.pivot() allows for setting columns as row and column indices.
+    pivot is just a shortcut for creating a hierarchical index using set_index and reshaping with unstack
+    
+Data Transformation
+
+    to drop duplicated rows, optionally based on subset of columns
+        data.drop_duplicates(list_of_columns)
+    duplicated and drop_duplicates by default keep the first observed value combination. Passing take_last=True will return the last one
+    
+Transforming Data Using a Function or Mapping
+
+    map a lambda function to the DF to perform element-wise transformations
+        dataframe['column'].map(lambda x: function(x))
+        
+Replacing Values
+
+    use the replace dataframe method to replace certain elements with another
+    you can use a dict or two lists or two values
+        dataframe.reaplce(to_replace, replace_with_this)
+
+
+rename the index and column members with the dataframe.rename() method
+
+
+use the cut method to categorize a dataframe based on bins.
+This returns a categorical object with label (which you can rename) and level (based on the bins) indices
+
+use qcut for quntiles
+
+To select a random subset from a DF without replacement, one way is to slice off the first k elements of the array returned by permutation , where k is the desired subset size.
+
+        df.take(np.random.permutation(len(df))[:3])
+        
+        
+get_dummies converts a categorical variable into a "dummy" or "indicator" matrix - good for statistical modeling and machine learning
+Essentially shows in binary when a row belongs to a group.  You can use it in multi-indexing and categorical data. useful to combine with cut or qcut.
+
+String Manipulation
+
+    the regular expression module re is really good for working with strings.
+    Creating a regex object with re.compile is highly recommended if you intend to apply the same expression to many strings; doing so will save CPU cycles.
+            
+            regex = re.compile('\s+') # variable whitespace
+        and then use the methods of the regex object
+            regex.split(text)
+    
+Vectorized string functions in pandas
+
+    String and regular expression methods can be applied (passing a lambda or other function) to each value using data.map, but it will fail on the NA
+    Use the pandas.Series.str attribute to deal with this, and can use regular expressions
+            pandas.dataseries.str.findall(regex_pattern)
+    

@@ -1,0 +1,56 @@
+Further Techniques and Applications in Regression Analysis
+
+Functional Form
+    You can transform some nonlinear functions into linear ones so that the OLS method can still be used.  Applyiung the OLS method to the transformed linear functions gives unbiased slope estimates.
+    Common Transformations:
+	Double Log - slope parameters represent elasticities - Cobb-Douglas production function
+	Semilog - appropriate when the dependent variable grows at about a constant rate over time, as in the case of the labor force and population - 
+	Reciprocal - appropriate to estimate average-cost and total-cost curves
+	Polynomial - appropriate to estimate average-cost and total-cost curves - Taylor's Theorem
+
+Dummy Variables
+    Qualitative explanatory variables can be intriduced into regression analysis by assigning binary variable to inputs.  Dummy variables can be used to capture change in the intercept (unit changes), the slope, or both.
+    For k classifications, k-1 dummy variables are required.
+    Using dummy variables for classification is better than two separate regressions because the degrees of freedom are greater and a variety of hypothesis can easily be tested to see if the differences in constants and/or slopes are statistically significant.
+    
+    You can test for a shift in the intercept - unit shift - given some event (worker's strike) or seasonal effects.
+    
+    
+Distributed Lag Models
+    A distributed lag model is one in which the current value of the dependent variable Yt depends on the weighted sum of present and past values of the independent variables and the error term, with generally different weights assigned to various time periods (usually declining successively for earlier time periods).
+    The inclusion of each lagged term uses up one degree of freedom.
+    
+    
+    Koyck lag model - geometrically decline weights of independent variable - violates two assumptions and results in biased and inconsistent estimators that require adjustments.
+    Almon lag model - allows for more flexible lag structure to be approximated empirically by a polynomial degress at least one more than the number of turning points in the function. does not replace the lagged independent variables (the Xs) with the lagged dependent variable, it does not violate any of the OLS assumptions (as does the Koyck model).
+        Disatvantage is that neither the period nor the form of the lag may be suggested by theory or be known a priori.
+    
+
+Forecasting
+    Estimating the value of the dependent variable Y given the actual or projected value of the independent variable X.
+    Conditional forecast is forecasting the dependent term based on the forecasted independent terms.
+    
+    Give the forecast-error variance, both the population and the unbiased estimate, and the confidence interval for the Y forecast. (1) the random nature of the error term, (2) estimated unbiased parameters equal the true parameters only on the average, (3) errors in projecting the independent variables, and (4) incorrect model specification.
+    Graph the forecasted regression line with the confidence interval bands.
+
+BINARY CHOICE MODELS
+    For binary classification - when the dependent variable is a dummy (binary). OLS is not appropriate. It's non-linear and requires a computer.
+    The dependent Variable is considered an underlying propensity for the dummy variable to take the value of 1, and is a continuous variable.
+    You pretty much regress the probability of the dependent variable on a binary distribution.
+    If the Standard-Normal distribution is used to find the probabilities, it is a "probit model".
+    If the logistic distribution is use, it is a "logit model".
+    To test significance, we can use the usual t test, but since probit uses the standard normal distribution, the z tables can be used.
+
+Interpretation of binary Choice models
+    The interpretation of the coefficient of an independent variable changes in a binary choice model. The coefficient becomes the effect of the independent variable on the the probability of the Dependent variable being 1.  the coefficient has an ambiguous interpretation, and cannot be compared across different models, or between probit and logit.
+    The marginal effect of X on P(Y=1) is easier to interpret.  Since Y is observable, the interpretation of the marginal effect is clearer, and the marginal effect should be robust across models. Marginal effects should differ only slightly between probit and logit.
+    Given for Probit and Logit.
+	Goodness of Fit:
+		To test the fit of the model, compare max log-likiehood of the regular coefficient and a constant as the variable - to see if including the varible makes a difference in the predictive ability of the model.
+		You can also compare the predicted values with the actual values when back testing.
+		Make confusion matrix to show results.
+	
+
+
+
+

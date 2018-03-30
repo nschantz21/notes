@@ -1,0 +1,59 @@
+Potential Dashboards for Portfolio Analysis
+
+Essentially two options:
+    
+    Static pages:
+        Interactive components (graphs, tables, etc)
+        Manually generated, maybe we could set up a script that runs once a day to generate the files.
+        Pretty easy to create, but with less functionality.
+        The only real drawback is that you are limited to the data you had at compilation.
+
+    Hosted pages:
+        Interteractive components and dynamically updating. Able to run code interactively or in the background.
+        Requires a host(server) for the app itself.
+        More complicated to create and maintain, but with greater functionality and flexibility.
+        Requires link to active data sources - internal/external hosted server
+
+Dash: https://plot.ly/products/dash/
+    Hosted
+    Python
+    Requires Dash Server
+
+Shiny: https://shiny.rstudio.com/gallery/
+    Hosted
+    R
+    Requires Shiny Server
+
+R Markdown/Knitr:
+    Static
+    Able to make entire website.
+    This is pretty much what we use now.
+    Not super flexible, but not bad either.
+
+Webpage:
+    Can be Static or Hosted.
+    We can statically generate html files that are in a shared folder. The issue with this approach is that it would require us to generate the files every time - not dynamically updating with new information.
+    Hosted using some larger web framework, like Angular or Dajngo. This would probably be the best if incorporated into a larger web app framework.
+
+JupyterLab: https://jupyterlab.readthedocs.io/en/stable/
+    This is probably the best solution at the moment. You access a hosted file or lab through the browser.  Sharing interactive notebooks may be problematic over work network - will try at home.
+    We can also generate static HTML pages - with interactive widgets.
+
+JupyterHub: http://jupyterhub.readthedocs.io/en/latest/
+    Looks promising.
+    Serves interactive notebooks (or JupterHub), possibly with common database backend.  I think it would be better to not have a common environment though, since dependencies may differ between projects.
+    Requires host.
+
+Binder: https://mybinder.org/
+    Very similar to JupyterHub.
+    Turns a GitHub repo into a collection of interactive notebooks. You can open the notebooks in an executable environment, making code reproducible. Pulls the repo, builds a docker container (which you can specify the build config), starts a JupyterHub and hosts the repo contents as interactive notebooks.
+    We can host our own BinderHub or use the one that's free online.
+
+
+I think static pages are fine, although slightly limited by the fact that they need to be recreated every time you want new data.  This is similar to what we are doing now with our technical indicators, although in this case the files would be in some shared location as a directory.
+
+The hosted options would be great because it would be less manual compilation and could fit into a larger automated framework. I don't know how practical they are at this point though. The main challenge is the hosting platform.
+The skill to build and maintain it is also non-trivial. Another challege is the data source management, although I think that is less of an issue if we have an in-house Thompson or compustat data feed. We could also house our own database of curated/transformed data to be the back-end of the dashboard, but you run into similar issues of maintainance.
+
+There are paid options for plotly and dashboard, but I don't really think it's worth it.
+There are also paid hosting platforms - AWS, Google Cloud Services, Azure.

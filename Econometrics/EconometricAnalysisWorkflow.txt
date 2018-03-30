@@ -1,0 +1,48 @@
+Economic or financial theory (previous studies)
+
+Formulation of an estimable theoretical model
+    Mathematical Model
+        e.g. Output = Input * Productivity - Fixed Cost
+    Econometric (Stochastic) Model
+        e.g. Output = Input * Productivity - Fixed Cost + Exogenous Variable(s)
+
+Collection of Appropriate Data
+    Data Source Documentation - common framework used across models
+    Set up scripts
+    Storage considerations
+
+Data Exploration
+    Gain insights based on exploration
+    Descriptive Statistics and Visualizations based on the nature of the data
+        Sample size needed
+
+Data Preparation
+    Prep data to better expose the underlying data patterns to Machine Learning Algorithms
+
+Modeling
+
+    Model Selection
+    Hypothesis formation - this might not go in this step
+          State above theory in hypothesis form and set testing criteria
+    Statistical Inference
+        Estimation
+            Estimation of poplation parameter from sample (Estimation of the Coefficients of the function)
+        Statistical Analysis
+            Hypothesis testing, maybe visualizations too
+    Refinement
+        Check for data leakage - Leaky Predictors and Leaky Validation Stategies
+    Interpretation
+
+Present Solution - or scrap model
+
+Production -  The context in which the finished model is used
+
+    Launch, Monitor, and Maintain system
+
+The Ideas here are a combination of outlines and ideas from the below sources.
+    Schaum's Outline of Theory and Problems of Statistics and Econometrics - Salvatore, Reagle, 2002
+    Introductory Econometrics for Finance - Brooks, 2008
+    Econometric Analysis - Greene, 2003
+    Hands-On Machine Learning with Scikit-Learn & TensorFlow - Aurelien Geron, 2017
+    Development Workflows for Data Scientists - Ciara Byrne, 2017
+    Time Series Analysis - Ruey S. Tsay, 2005

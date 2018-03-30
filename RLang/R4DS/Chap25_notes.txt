@@ -1,0 +1,107 @@
+Chapter 25 Many Models
+
+three powerful ideas that help you to work with large numbers of models with ease:
+
+Using many simple models to better understand complex datasets.
+
+Using list-columns to store arbitrary data structures in a data frame. For example, this will allow you to have a column that contains linear models.
+
+Using the broom to turn models into tidy data. This is a powerful technique for working with large numbers of models.
+
+To remove a strong signal from a data group - if you want to see what doesn't follow the trend - you can tease the factors apart by fitting a model with a linear trend.  The model captures steady growth over time, and the residuals will show what's left.
+
+25.2 gapminder
+
+    25.2.1 Nested data
+        
+        To apply a function group-wise, use the group_by() function, then create a nested data frame using tidyr::nest(). This will create a df with a row for each group, and a column of nested dfs.
+        df %>%
+            group_by(group) >%>
+            nest()
+    
+    25.2.2 List-columns
+        
+        The data frames are in a list, so we can use purrr::map() to apply whatever linear model to each element. You can then add the list of  resulting models to the df of groups.
+        This way you don't need to keep multiple lists synced when subsetting.
+        
+    25.2.3 Unnesting
+    
+        To compute the residuals, we need to call add_residuals() with each model-data pair.
+        grouped_df <- grouped_df %>%
+            mutate(resids = map2(data, model, add_residuals))
+        
+        You can then unnest the grouped dfs with the residuals in order to viusualize them.
+                unnest(grouped_df, residuals_column)
+        
+        Then plot the residuals.
+        
+    25.2.4 Model quality
+    
+        use broom::glance() to extract some model quality metrics
+        If we apply it to a model, we get a data frame with a single row.
+        
+        You can then apply it to the grouped_df
+            by_country %>% 
+                mutate(glance = map(model_column, broom::glance)) %>% 
+                unnest(glance, .drop = TRUE)
+        
+        You can then look for models that do not fit well: have bad R-sqared - statistical measure of how close the data are to the fitted regression line. It is also known as the coefficient of determination, or the coefficient of multiple determination for multiple regression.
+        
+25.3 List-columns
+    
+    columns of list objects - allow for most complex data structures of varying length. List-columns are often most useful as intermediate data structure, but are hard to work with directly.
+    
+    
+25.4 Creating list-columns
+
+    to create list columns use:
+        tidyr::nest()
+        mutate()
+        summarise()
+        tibble::enframe()
+    
+    when creating list-columns, you should make sure they’re homogeneous
+        
+    25.4.1 With nesting
+        
+        nest() creates a nested data frame, which is a data frame with a list-column of data frames. In a nested data frame each row is a meta-observation.
+        You can also use nest() as a grouping function, specifying which groups you want to nest.
+        
+    25.4.2 From vectorised functions
+    
+        stringr::str_split()
+        purrr::map
+        
+    25.4.3 From multivalued summaries
+        
+        useful in summarizing quantile data.
+            summarise(q = list(quantile(x)))
+            
+        use unnest() to see summary of probabilites of quantiles
+            group_by %>%
+                summarise(p = list(probs), q = list(quantile(x, probs))) %>%
+                unnest()
+                
+    25.4.4 From a named list
+    
+        use tibble::enframe() to nest a list in a df and add a character vector of metadata - useful if you want to map2 or pmap with the list-column as an input.
+        
+25.5 Simplifying list-columns
+
+    If you want a single value, use mutate() with map_lgl(), map_int(), map_dbl(), and map_chr() to create an atomic vector.
+
+    If you want many values, use unnest() to convert list-columns back to regular columns, repeating the rows as many times as necessary.
+    
+    25.5.1 List to vector
+    
+        you can mutate the typeof and length of a list-column into other columns of a df to act as meat data - that you can then use to filter a heterogeneous list-column.
+    
+    25.5.2 Unnesting
+    
+        unnest() works by repeating the regular columns once for each element of the list-column - essentially acts as multi-indexing
+        
+25.6 Making tidy data with broom
+    
+    broom::glance(model) - returns a row (model summary) for each model
+    broom::tidy(model) -  returns a row for each coefficient in the model. 
+    broom::augment(model, data) - returns a row for each row in data, adding extra values like residuals, and influence statistics.

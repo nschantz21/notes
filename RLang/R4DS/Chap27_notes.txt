@@ -1,0 +1,108 @@
+Chapter 27 R Markdown
+
+R Markdown files are designed to be used in three ways:
+
+For communicating to decision makers, who want to focus on the conclusions, not the code behind the analysis
+
+For collaborating with other data scientists (including future you!), who are interested in both your conclusions, and how you reached them (i.e. the code
+
+As an environment in which to do data science, as a modern day lab notebook where you can capture not only what you did, but also what you were thinking
+
+27.2 R Markdown basics
+
+    R Markdown file is a plain text file that has the extension .Rmd
+    
+    It contains three important types of content:
+
+    An (optional) YAML header surrounded by ---s.
+    Chunks of R code surrounded by ```.
+    Text mixed with simple text formatting like # heading and _italics_.
+    
+    It's pretty much a text file with embedded R code. You can "knit" it, and export it as a HTML page as well. 
+    rmarkdown::render("1-example.Rmd") displays report in viewer pane and creates HTML page.
+    
+27.3 Text formatting with Markdown
+    
+    just look at the reference guide.
+    
+27.4 Code chunks
+
+    ```{r chunk_name, options} 
+    your_code
+    ```
+    
+    27.4.1 Chunk name
+    
+        Easily navigate to specific chunks using the drop-down code navigator in the bottom-left of the script editor.
+        Graphics produced by the chunks will have useful names
+        Set up networks of cached chunks to avoid re-performing expensive computations on every run
+        
+        name chunks after the primary object that it creates
+        
+    27.4.2 Chunk options
+    
+        Chunk output can be customised with options, arguments supplied to chunk header.  The most important set of options controls if your code block is executed and what results are inserted in the finished report.
+    
+    27.4.3 Table
+    
+        By default, R Markdown prints data frames and matrices as you’d see them in the console.  use knitr::kable for additional formatting.
+        
+    27.4.4 Caching
+    
+        Use cache = True chunk option for computationally intensive code.  It will save the initial output to a file, and load it on later runs.
+        
+        The caching system must be used with care, because by default it is based on the code only, not its dependencies. You can avoid that problem with the "dependson" chunk option.
+
+        knitr caching only tracks changes within the .Rmd file.  If you want to also track changes to that file you can use the cache.extra option
+        
+        use file.info() when tracking outside files as dependencies.
+        
+        As your caching strategies get progressively more complicated, it’s a good idea to regularly clear out all your caches with knitr::clean_cache()
+        
+    27.4.5 Global options
+        
+        knitr::opts_chunk$set()
+        sets local scope options
+        
+    27.4.6 Inline code
+    
+        use `r your_code_here` for inline code
+        
+        use format() for formatting numbers
+        
+    27.5 Troubleshooting
+    
+        always try is to recreate the problem in an interactive session. Restart R, run all chunks, and deal with it interactively.
+        set error = TRUE on the chunk causing the problem, then use print() and str() to check that settings are as you expec
+        
+27.6 YAML header
+
+    controls whole document settings.
+    
+    27.6.1 Parameters
+    
+        use parameters to store variables that you can then use in the R code
+            params:
+                my_class: "suv"
+        filter(class == params$my_class)
+        
+        parameters are available within the code chunks as a read-only list named params
+        
+        use !r to run R code as a parameter.  This is a good way to get the date
+        you can pass a list of params to rmarkdown::render
+        
+        Use these in conjunction with purrr::walk to produce many reports with varying parameters.
+        
+    27.6.2 Bibliographies and Citations
+    
+        automatically generate citations and a bibliography by specifying a bibliography file to the bibliography field in the Rmd's header.
+        use the "@" to cite.
+        
+27.7 Learning more
+    
+    books:
+        Happy Git with R
+        "Git and GitHub" chapter of R Packages
+         Style: Lessons in Clarity and Grace by Joseph M. Williams & Joseph Bizup
+         The Sense of Structure: Writing from the Reader’s Perspective by George Gopen
+         

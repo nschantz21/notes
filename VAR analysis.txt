@@ -1,0 +1,46 @@
+Use Cases of VARs etc:
+    estimating relationships between the time series and their lagged values is the vector autoregression process - endogeneous
+    the standard error is a vector of nonautocorrelated disturbances (innovations) with zero means and contemporaneous covariance matrix.
+    Obviates a decision as to what contremporaneous variables are exogeneous.
+    testing Granger Causlity and the effects of policy through impulse respinse - p 587
+    
+    
+    
+    We can use this information to forcast based on the appropriate lag.
+    
+Impulse Response Analysis - estimate the lag and magnituded of a response to a unit impulse in one of the variables. Both period and cumulative effects.
+
+Dynamic Vector AutoRegression:
+
+    Moving Window regression of time series data for the purpose of making forecasts throughout the data sample - similar to Kalman Filter, except look-ahead windows is constant.
+    
+Benefits:
+    generality and scalability
+    All variables are endogeneous - there is no explicit target - so it will also model how the "target" affects the inputs.
+    Can be further extended to include first difference terms and cointegrating relationships.
+    Forecasts better than traditional structural models.
+    
+Challenges:
+    Use little theoretical information about the relationships between variables to guide the specs of the model.
+    Less amenable to theoretical analysis and therefore to policy prescriptions.
+    Unclear how VAR coefficient estimates should be interpreted.
+    
+    For relatively small sample sizes, degrees of freedom will rapidly be used up, implying large standard errors and therefore wide confidence intervals for model coefficients - requires a decent amount of data.
+    
+    The proliferation of parameters in VARs has been cited as a major disadvantage of their use, although model-size issue may well be exaggerated since you generally don't use that many inputs.
+     
+Use the Information Criteria for VAR Lag Selection
+    requires no normailty assumptions concerning distribution of errors.
+
+Testing:
+    is complicated
+    Use a modified(?) Wald Statistic.
+    
+    Granger Causlity:
+        Causality in the sense defined by Granger (1969) and Sims (1972) is inferred when lagged values of a variable, say xt , have explanatory power in a regression of a variable yt on lagged values of yt and xt
+        You can test for Granger Causality with the F-Test - normal distributions - or the Wald test (more general) - Greene p 592-3
+        
+        Challenge:
+            the causality tests are predicated on a model that may, in fact, be missing either intervening variables or additional lagged effects that should be present but are not.
+            the problem is that a finding of causal effects might equally well result from the omission of a variable that is correlated with both of (or all) the left-hand-side variables.
+    

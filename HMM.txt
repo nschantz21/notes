@@ -1,0 +1,10 @@
+Hidden Markov Model:
+
+    Hidden Markov Models (HMM) are similar to the Kalman filter (i.e. similar to other State Space models) where the the probability of the next state only depends on the current state
+    
+    Using the Expectation-Maximization algorithm estimate the parameters in the HMM by maximizing the likelihood -> the initial probabilities in each state, transition probabilities of the state, the probabilities of being in each state, and mean and volatilities of the returns conditional on each state.
+    
+    using R package "mhsmm"
+    
+    Better to have more observations in the estimation of HMM to ensure different states have occurred with a significant frequency.
+    

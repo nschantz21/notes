@@ -1,0 +1,120 @@
+Environments
+
+    data structure that powers scoping.  have reference semantics - when you modify a binding in an environment, the environment is not copied, but modified in place.
+    
+Environment basics - basic properties of an environment and creation.
+    
+    job of environment is to bind a set of name to a set of values.
+    Each name points to an object stored elsewhere in memory.
+    
+    references can point to different objects that have the same value.
+    If an object has no names pointing to it, it gets automatically deleted by the garbage collector.
+    
+    Every environment, except the empty environment, has a parent environment. The parent is used to implement lexical scoping.
+    
+    Given an environment we have no way to find its children - there are no back links
+    
+    Every name in an environment is unique; The names in an environment are not ordered; An environment has a parent; Environments have reference semantics
+    
+    an environment is made up of two components, the frame, which contains the name-object bindings (and behaves much like a named list), and the parent environment.
+    
+    four special environments:
+        globalenv(), or global environment, is the interactive workspace
+        baseenv(), or base environment, is the environment of the base package
+        emptyenv(), or empty environment, is the ultimate ancestor of all environments
+        environment() is the current environment
+        
+    search() lists all parents of the global environment - object search path. it contains one env for each attached package, and special 
+    Autoloads env - used to save memory by only loading package objects when needed - like big data sets - kinda like 'all' variable in python packages.
+    
+    as.environment() allows you to access any env on the search() list
+    
+    Each time you load a new package with library() it is inserted between the global environment and the package that was previously at the top of the search path - this is how the overwriting precedence is set for names in the current environment - why function names clash, the last loaded one wins.
+    
+    new.env() - manually create new env. use ls(environment) to see bindings 
+    parent.env(environment) to see parent env
+    You can modify bindings like you would a named list env$bind <- bind_value
+    in ls() use all.names = TRUE to show all bindings in an environment
+    
+    ls.str(environment, all.names=True) - shows each obj in env
+    
+    use rm() to remove a binding, don't just set it to NULL
+    
+    exists() - see if a binding exists in an environment - will follow regular scoping and look to parents.
+    
+    indentical() - to compare environments
+    
+Recursing over environments
+
+    pryr::where(variable, start_env) finds the environment where that name is defined, using R’s regular scoping rules - gieven a variable and starting point. parent.frame() is a good starting point.
+    
+    Throws error if gets to empty env and hasn't found name.  Searches recursively in parent environment until name is found or reaches empty env.
+    
+    Iteration vs. recursion:
+        
+        You can iterate using a for loop - it's faster because it removes the function call overhead, but it's mroe confusion.
+
+Function environments
+    
+    4 environments associated with a function
+    
+    The enclosing environment:
+        environment where the function is made.  usedfor lexical scoping.
+        environment(function)  - shows enclosing function
+    
+    Binding environments:
+        where("function") - shows binding env
+        The name of a function is defined by a binding. function binding environments are all environments which have a binding to it. This doesn't affect enclosing environment. The distinction between the binding environment and the enclosing environment is important for package namespaces. Package namespaces keep packages independent.
+        
+        Packages have two environments:
+            package - every publicly accessible function - placed on the search path
+            namespace - all functions and special import of necessary bindings from parent env
+            Every exported function in a package is bound into the package environment, but enclosed by the namespace environment.
+        
+    Execution environments:
+    
+        environment enclosed in function definition; auto-garbage collection of function local scope at closing bracket.
+        
+    Calling environments:
+    
+        use parent.frame() for the calling environment.
+        R’s regular scoping rules only use the enclosing parent - use calling environment for dynamic scoping.  
+       Dynamic scoping does not care how the code is written, but instead how it executes. Each time a new function is executed, a new scope is pushed onto the stack. This scope is typically stored with the function’s call stack. When a variable is referenced in the function, the scope in each call stack is checked to see if it provides the value.
+        Dynamic scoping is primarily useful for developing functions that aid interactive data analysis
+        
+Binding names to values
+    
+    Assignment is the act of binding (or rebinding) a name to a value in an environment.  You can bind values, expressions (promises), and functions to names.
+    ?Reserved - for a list of reserved names in base R
+    You can override this with backticks.
+    
+    Quotes:
+        
+        You can also create non-syntactic bindings using single and double quotes instead of backticks.
+        The regular assignment arrow, <-, always creates a variable in the current environment.
+        The deep assignment arrow, <<-, never creates a variable in the current environment, but instead modifies an existing variable found by walking up the parent environments. If it doesn't find an existing variable, it will create one in the global environment. -- deep assignment is most often used in closures
+        
+    Special bindings:
+        
+        %<d-% - delayed binding - wrapper for base::delayedAssign() - creates and stores a promise to evaluate the expression when needed. from pryr. -- used for autoload() in packages
+        
+        %<a-% - Active binding - wrapper for base makeActiveBinding() - are not bound to a constant object. Instead, they’re re-computed every time they’re accessed -- used for reference class fields
+        
+Explicit environments
+
+    useful as data structures because they have reference semantics.
+    You can use environments to pass data between functions, but you should set its parent env to emptyenv() first so it doesn't acidentally inherit bindings.
+    Environments are data structures useful for solving three common problems:
+
+        Avoiding copies of large data.
+        Managing state within a package.
+        Efficiently looking up values from names.
+        
+    Avoiding copies:
+        useful for large objects
+        
+    Package State:
+        allow you to maintain state across function calls in packages. In a package, you aren't allowed to modify objects. So you can create an environment, then modify it and return that, then invisibly return the original value, in conjunction with on.exit() - seems like the object was not changed in the function call.
+        
+    As a Hashmap:
+        environments provide O(1) lookup time.

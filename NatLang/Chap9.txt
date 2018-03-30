@@ -1,0 +1,122 @@
+Chapter 9   Building Feature Based Grammars
+
+How can we extend the framework of context free grammars with features so as to gain more fine-grained control over grammatical categories and productions?
+What are the main formal properties of feature structures and how do we use them computationally?
+What kinds of linguistic patterns and grammatical constructions can we now capture with feature based grammars?
+
+9.1   Grammatical Features:
+
+    Explore the role of features in building rule-based grammars. we are now going to declare the features of words and phrases (in the form of a dict{feature : value}), instead of extracting.
+    Feature Structures - pairings of features and values. Information in the structs need not be exhaustive, and we might want to add further properties.
+    You can use feature structures in Context Free Grammar and parsing.  Syntactic Agreement can be expressed elegantly using features.
+    
+    Syntactic Agreement:
+        
+        Formal Agreement or concord happens when a word changes form depending on the other words to which it relates. e.g. subject plurality and verb usage
+        
+        When manually encoding formal agreement in CFG, you would need to account for each combination of syntactic agreement - this would lead to too many productions, is sloppy and impractical.
+        
+    Using Attributes and Constraints:
+        
+        You can assign features to the categories' feature structures (e.g. V, N, Det) that can then be used as constraints in grammar parsing through the use of variable.
+                e.g. S -> NP[NUM=?n] VP[NUM=?n]
+                     NP[NUM=?n] -> Det[NUM=?n] N[NUM=?n]
+        
+        To allow for multiple feature values as a contraint when testing for agreement, such as using 'the' for plural and singular nouns, you can just omit that constraint. We only need to explicitly enter a variable value when this constrains another value elsewhere in the same production.
+        
+        One possible approach to parsing productions containing feature constraints is to compile out all admissible values of the features in question so that we end up with a large, fully specified CFG.
+        Feature values "flow upwards" from lexical entries, and variable values are then associated with those values, via bindings (i.e., dictionaries). As the parser assembles information about the nodes of the tree it is building, these variable bindings are used to instantiate values in these nodes.
+    
+    Terminology:
+    
+        Atomic - values that cannot be decomposed into parts
+        auxiliary - having binary value, and able to be represented by boolean values - e.g. can, cannot; may, may not;
+        You can represent auxiliary Atomic features as +aux and -aux.
+        In addition to atomic-valued features, features may take values that are themselves feature structures - Agreement features can become a substructure and have a complex value - this can be represented in an attribute value matrix or nested dictionaries.
+                	
+                [POS = N           ]
+                [                  ]
+                [AGR = [PER = 3   ]]
+                [      [NUM = pl  ]]
+                [      [GND = fem ]]
+
+        You can then compare complex agreement features or their members as syntactic constraints.
+
+9.2   Processing Feature Structures
+        
+   Feature structures in NLTK are declared with the FeatStruct() constructor. Atomic feature values can be strings, integers, or complex data structures. It makes a dictionary of features. Can also take feature structures as a string - you can put it in a file.
+   Feature Structures are directed acyclic graphs. Keys are edges and values are nodes. Feature path is a sequence of arcs that can be followed from the root node. When two paths have the same value, they are equivalent.
+   In order to indicate reentrancy in our matrix-style representations, prefix the first occurrence of a shared feature structure with an integer in parentheses (1) - tag or coindex. Any later reference to that structure will use the notation ->(1).
+   
+   Subsumption and Unification:
+   
+        Subsumption - Ordering features by genrality of values. A more general feature structure subsumes a less general one. If a feature structure subsumes another, it inherits all the paths and path equivalences of the base.
+        Unification - Merging information from two feature structures. 
+            nltk.FeatStruct().unify(another_feature_structure)
+            Key collisions (shared paths) that do not match in feature structures will prevent unification.
+        If a unification involves specializing the value of some path π, then that unification simultaneously specializes the value of any path that is equivalent to π.
+        Structure sharing can also be stated using variables such as ?x
+        
+        
+9.3   Extending a Feature based Grammar
+
+    Subcategorization:
+        
+        Can you replace atomic nonterminal symbols in a CFG with a super structure with features?
+        Generalized Phrase Structure Grammar (GPSG), tries to solve this problem by allowing lexical categories to bear a SUBCAT which tells us what subcategorization class the item belongs to, then making productions based on those subcats.  SUBCAT can only appear on lexical categories (V, N, Det, P)
+        
+        In PATR and Head-driven Phrase Structure Grammar, rather than using SUBCAT values as a way of indexing productions, the SUBCAT value directly encodes the valency of a head (the list of arguments that it can combine with).
+        
+        A sentence is a kind of verbal category that has no requirements for further arguments, and hence has a SUBCAT whose value is the empty list.
+        
+    Heads Revisited:
+        
+        Not all phrases have heads - like in lists, there's nothing to structure the sentence in a parent-child relationship.
+        X-bar Syntax addresses this issue by abstracting out the notion of phrasal level. It is usual to recognize three such levels. If N represents the lexical level, then N' represents the next level up, corresponding to the more traditional category Nom, while N'' represents the phrasal level, corresponding to the category NP.
+        
+        Phrasal Projections - Derivative phrasal levels. 
+        Maximal Projection - the highest order derivative phrasal level.
+        Zero Projection - the base phrase
+        
+        Using X as a variable over N, V, A and P, we say that directly subcategorized complements of a lexical head X are always placed as siblings of the head, whereas adjuncts are placed as siblings of the intermediate category, X'.
+        
+        Easily encoded in CFG productions.
+        e.g.
+            	
+            S -> N[BAR=2] V[BAR=2]
+            N[BAR=2] -> Det N[BAR=1]
+            N[BAR=1] -> N[BAR=1] P[BAR=2]
+            N[BAR=1] -> N[BAR=0] P[BAR=2]
+    
+    Auxiliary Verbs and Inversion:
+    
+        Inverted clauses — where the order of subject and verb is switched — occur in English interrogatives and also after 'negative' adverbs.
+        You can check for invertedness through the feature structure of Auxiliary verbs(+- aux). 
+            e.g.	
+                S[+INV] -> V[+AUX] NP VP
+
+    
+    Unbounded Dependency Constructions:
+    
+        Gap - place in sentence where obligatory complements have been ommited.
+        Filler - word/s that substitute Gaps. (e.g. who, which)
+        A gap can occur if it is licensed by a filler. Conversely, fillers can only occur if there is an appropriate gap elsewhere in the sentence
+        
+        The mutual co-occurence between filler and gap is sometimes termed a "dependency". There is no upper bound on the distance between filler and gap.
+        
+        Unbounded dependency construction -  filler-gap dependency where there is no upper bound on the distance between filler and gap.
+        
+        Handling Unbounded Dependencies:
+            
+            Generalized Phrase Construction:
+                Slash Categories - has the form Y/XP; we interpret this as a phrase of category Y that is missing a sub-constituent of category XP. In the Tree structure, the gap is percolated down, until it reaches where the gap should be (XP/XP) and discharges an empty string.
+                Used by treating slash as a feature, and the category to its right as a value; that is, S/NP is reducible S[SLASH=NP]
+                You can also treat it with a variable S/x? -> NP VP/x?
+                
+    
+Typed Feature Structures:
+    
+    Typed Feature Structures allow us to capture important constriants on linguistic information. We can stipulate that feature values are always typed. In the case of atomic values, the values just are types.  In the case of complex values, we say that feature structures are themselves typed.
+    This is pretty much just recursively C++ typing in the feature structure.
+    
+    

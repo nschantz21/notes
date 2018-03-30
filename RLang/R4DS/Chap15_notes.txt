@@ -1,0 +1,37 @@
+15 Factors
+
+Factors are used to work with categorical variables, variables that have a fixed and known set of possible values. They are also useful when you want to display character vectors in a non-alphabetical order.
+
+The forcats package, which provides tools for dealing with categorical variables. Not part of tidyverse.
+
+15.2 Creating factors
+
+    To create a factor you must start by creating a list of the valid levels - this could just be a set of possible values.
+    You then pass that as the levels argument in the factor() function.
+    
+    If you add a factor that is not in levels, then it will be converted to NA.  If you don't provide levels, they will be taken from the fator data in alphabetical order. You can order the levels when implicitly taken from the data, using unique(data), or fct_inorder() after construction.
+    
+    You can graph stuff based on levels - like count(). By default, ggplot2 will drop levels that don’t have any values. You can force them to display with scale_x_discrete(drop = FALSE) added to th ggplot statement.
+    
+
+15.4 Modifying factor order
+    
+    fct_reorder() takes three arguments:
+        
+        f, the factor whose levels you want to modify.
+        x, a numeric vector that you want to use to reorder the levels.
+        Optionally, fun, a function that’s used if there are multiple values of x for each value of f. The default value is median.
+
+    This is important when for visualizations based on factors. If you are making more complicated transformations, put them in a mutate step, rather than in the aes argument of ggplot.
+    
+    for bar plots, you can use fct_infreq() to order levels in increasing frequency.
+    
+15.5 Modifying factor levels
+
+    This allows you to clarify labels for publication, and collapse levels for high-level displays. The most general and powerful tool is fct_recode(). It allows you to recode, or change, the value of each level.
+    
+    fct_recode() will leave levels that aren’t explicitly mentioned as is, and will warn you if you accidentally refer to a level that doesn’t exist.
+    
+    You can group factors together with this method as well.
+    
+    fct_lump() - lump together all the small groups to make a plot or table simpler.

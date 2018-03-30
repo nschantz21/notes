@@ -1,0 +1,34 @@
+You can join Tibbles and DFs like SQL tables using Joins - just like relational dbs.
+
+dplyr::join
+inner_join, left_join, right_join, full_join, semi_join, anti_join
+
+13.3 Keys
+    Once you’ve identified the primary keys in your tables, it’s good practice to verify that they do indeed uniquely identify each observation. One way to do that is to count() the primary keys and look for entries where n is greater than one
+    If a table lacks a primary key, it’s sometimes useful to add one with mutate() and row_number(). That makes it easier to match observations if you’ve done some filtering and want to check back in with the original data. This is called a surrogate key.
+    You can model many-to-many relations with a many-to-1 relation plus a 1-to-many relation.
+    
+    For a natural join, use by = NULL.
+    
+    base::merge() can perform all four types of mutating join as well; however, dplyr’s joins are considerably faster and don’t mess with the order of the rows.
+    
+    Anti-joins are useful for diagnosing join mismatches. like Outer Join.
+    
+13.6 Join problems
+
+    Steps to make joins go more smoothly:
+        1. Identify primary keys in all tables.
+        2. Check that none of the variables in the primary key are missing. 
+        3. Check that your foreign keys match primary keys in another table. best way to do this is with an anti_join().
+        
+    Be aware that simply checking the number of rows before and after the join is not sufficient to ensure that your join has gone smoothly. If you have an inner join with duplicate keys in both tables, you might get unlucky as the number of dropped rows might exactly equal the number of duplicated rows!
+    
+13.7 Set operations
+
+    These expect the x and y inputs to have the same variables, and treat the observations like sets.
+    
+    intersect(x, y): return only observations in both x and y.
+    union(x, y): return unique observations in x and y.
+    setdiff(x, y): return observations in x, but not in y.
+
+    

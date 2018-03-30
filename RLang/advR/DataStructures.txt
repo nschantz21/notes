@@ -1,0 +1,64 @@
+Vectors
+
+    is.vector() does not test if an object is a vector. Instead it returns TRUE only if the object is a vector with no attributes apart from names. Use is.atomic(x) || is.list(x) to test if an object is actually a vector.
+    
+    Atomic vectors are always flat, even if you nest c()’s
+    NA will always be coerced to the correct type if used inside c()
+    
+    All elements of an atomic vector must be the same type, so when you attempt to combine different types they will be coerced to the most flexible type. logical < integer < double < character
+    
+    mathematical operators will coerce arguments to numeric types and logical operators will coerce to logic types
+    
+Lists
+    
+    is.recusrsive() to test for list
+    use c() to combine several lists into one
+    
+Attributes
+
+    The structure() function returns a new object with modified attributes
+    By default, most attributes are lost when modifying a vector - except names, dimensions, and class
+    use names(x), dim(x), and class(x) to set these
+    
+    Names:
+        use unique names - useful in subsetting.
+        create a new vector without names using unname(x), or remove names in place with names(x) <- NULL.
+        
+    Factors:
+         A factor is a vector that can contain only predefined values, and is used to store categorical data. Factors are built on top of integer vectors using two attributes: the class, “factor”, which makes them behave differently from regular integer vectors, and the levels, which defines the set of allowed values.
+         
+        Factors are useful when you know the possible values a variable may take, even if you don’t see all values in a given dataset. Using a factor instead of a character vector makes it obvious when some groups contain no observations.
+            
+        table(your_factors) will print the factors and counts even if zero
+            
+        if you get a factor instead of a numeric vector it means the data isn't clean, coerce to a character vector, then to double.  Then check for NAs. but this is stupid - fix it at an earlier stage if possible.
+            
+        most data loading functions in R (read_csv) automatically convert character vectors to factors - supress this with stringsAsFactors = FALSE.
+            
+Matrices and arrays
+
+    Adding a dim attribute to an atomic vector allows it to behave like a multi-dimensional array. matrix is 2d array.
+    
+    length() generalises to nrow() and ncol() for matrices, and dim() for arrays
+    names() generalises to rownames() and colnames() for matrices, and dimnames
+    
+    c() generalises to cbind() and rbind() for matrices, and to abind() (provided by the abind package) for arrays.
+    transpose a matrix with t(); the generalised equivalent for arrays is   aperm()
+    
+    You can have matrices with a single row or single column, or arrays with a single dimension. - not the same as 1d vector, but similar.
+    
+    the dimension attribute can also be set on lists to make list-matrices or list-arrays.
+    
+    
+Data Frames
+
+    a data frame is a list of equal-length vectors.
+    You can combine data frames using cbind() and rbind().
+    Use plyr::rbind.fill() to combine data frames that don’t have the same columns.
+    
+    Don't cbind() two vectors together to make a data.frame - just use the data.frame constructor
+    
+    To nest lists in data.frame use I() to make it treat the list as one unit.
+    it’s also possible to have a column of a data frame that’s a matrix or array, as long as the number of rows matches the data frame.
+    
+    Use list and array columns with caution: many functions that work with data frames assume that all columns are atomic vectors

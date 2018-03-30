@@ -1,0 +1,21 @@
+When columns of a df are actually values of a variables, you should use tidyr::gather() to transform the data.
+
+Use dplyr::left_join() for relational joins
+
+Use tidyr::spread() when an observation is scattered across multiple rows (the opposite of tidyr::gather()).
+
+gather() makes wide tables narrower and longer; spread() makes long tables shorter and wider.
+
+tidyr::separate() pulls apart one column into multiple columns, by splitting wherever a separator character appears. It's like split()
+
+tidyr::unite() is the inverse of separate(): it combines multiple columns into a single column.
+
+Missing Values:
+
+  Because explicit missing values may not be important in other representations of the data, you can set na.rm = TRUE in gather() to turn explicit missing values implicit:
+
+  Another important tool for making missing values explicit in tidy data is tidyr::complete()
+  
+  complete() takes a set of columns, and finds all unique combinations. It then ensures the original dataset contains all those values, filling in explicit NAs where necessary.
+  
+  use the tidyr::fill() function to fill missing data based on existing data.

@@ -1,0 +1,28 @@
+Fama MacBeth Paper
+Monthly percentage returns for all common stocks traded on NYSE during period January 1926 through June 1968
+Fisher's Arithmetic Index - Market Average
+
+Portfolio Construction
+Formation Period
+1926-1929 (1st 4 years) - should be 7 for other periods
+20 Portfolios of equally weighted securities are constructed based on ranked Correlation to the factor for individual securities
+
+Security Factor Exposures
+Initial Estimation Period
+1930-1934 (next 5 years)
+Recompute the security Beta to the market - this is then averaged across securities for the portfolio Beta.
+
+
+Rolling Portfolio Factor Exposures
+Testing period
+1935-1938 (next four years)
+Simple average of security level Factor Exposures
+Recomputed monthly - allows for delisting of securities
+Security Level Factor Exposure is updated annually to include the most recent trailing year in addition to the initial 5 year period.
+
+Compute the monthly returns of the 20 portfolios with equal weighting of individual securities each month.
+For Each month do cross-sectional regression - Portfolio Returns ~ Avg Security Factor Exposures
+
+
+
+For a security to be included in a portfolio, a security available in the first month of a testing period mmust also have data for all 5 years of the preceeding estimation period and for at least 4 years of the portfolio construction period.

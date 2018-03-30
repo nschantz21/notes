@@ -1,0 +1,106 @@
+Chapter 6: Data Loading, Storage, and File Formats
+
+Input and output typically falls into a few main categories: reading text files and other more efficient on-disk formats, loading data from databases, and interacting with network sources like web APIs.
+
+Reading and Writing Data in Text Format
+        
+    In some cases, a table might not have a fixed delimiter, using whitespace or some other pattern to separate fields. In these cases, you can pass a regular expression as a delimiter for read_table.
+    
+    Use "skiprows" parameter of read_table() to skip over comments in an import file.
+    
+    The na_values option can take either a list or set of strings to consider missing values
+    Different NA sentinels can be specified for each column in a dict
+    
+Reading Text Files in Pieces
+
+    If you want to only read out a small number of rows (avoiding reading the entire file), specify that with nrows.
+    To read out a file in pieces, specify a chunksize as a number of rows.
+    
+    TextParser is also equipped with a get_chunk method which enables you to read pieces of an arbitrary size
+    
+Writing Data Out to Text Format
+
+    you also write to delimited file using the .to_csv method. you can specify the delimiter and the type of output - sys out or file.
+    
+Manually Working with Delimited Formats
+
+    For any file with a single-character delimiter, you can use Python’s built-in csv module. To use it, pass any open file or file-like object to csv.reader - you can then clean it before importing to pandas.
+    
+    Defining a new format with a different delimiter, string quoting convention, or line terminator is done by defining a simple subclass of csv.Dialect
+    
+    To write delimited files manually, you can use csv.writer. It accepts an open, writable file object and the same dialect and format options as csv.reader
+    
+JSON Data
+
+    one of the standard formats for sending data by HTTP request.  To convert a JSON string to Python form, use json.loads
+    json.dumps on the other hand converts a Python object back to JSON.
+    you can pass a list of JSON objects to the DataFrame constructor and select a subset of the data fields.
+    pandas.read_json() available in pandas 0.20.2
+    
+XML and HTML: Web Scraping
+    
+    you can use the urllib2 and lxml module to open and parse, respecitvely HTML sources.
+        e.g. parsed = lxml.parse(urllib2.urlopen('www.url.com'))
+    or just use beautifulsoup
+    
+    Then you can find the tables in the html file - using the html table tags - table, tr, td, th... 
+    
+    This is a bit outdated... there's a read_html and to_html pandas function.
+    
+Parsing XML with lxml.objectify
+
+    an alternate interface that’s convenient for XML data, lxml.objectify
+    you can convert the xml tags and data values to a list of python dictionaries, then convert the list of dicts to a pandas DataFrame
+    
+Binary Data Formats
+
+    One of the easiest ways to store data efficiently in binary format is using Python’s builtin pickle serialization. pandas objects all have a save method which writes the data to disk as a pickle
+    pickle is only recommended as a short-term storage format. The problem is that it is hard to guarantee that the format will be stable over time.
+
+    DataFrame.to_pickle('save_file')
+    pandas.read_pickle('save_file')
+    
+Using HDF5 Format
+
+    HDF5 file contains an internal file system-like node structure enabling you to store multiple datasets and supporting metadata. For very large datasets that don’t fit into memory, HDF5 is a good choice as you can efficiently read and write small sections of much larger arrays.
+    pandas has a minimal dict-like HDFStore class, which uses PyTables to store pandas objects.
+    Objects contained in the HDF5 file can be retrieved in a dict-like fashion:
+        e.g. 
+        store = pd.HDFStore('mydata.h5')
+        store['obj1'] = frame
+        store['obj1'] # to retrieve
+    HDF5 is not a database. It is best suited for write-once, read-many datasets
+    
+Interacting with HTML and Web APIs
+
+    To access data feed APIs use the requests package. 
+        import requests
+        url = 'http://search.twitter.com/search.json?q=python%20pandas'
+        resp = requests.get(url)
+        
+    this will return the http get response in JSON or whatever, which you can convert to a python dictionary.
+    then make a list of the fields of interest and make a DataFrame from those fields.
+    You can create some higher-level interfaces to common web APIs that return DataFrame objects for easy analysis.
+    
+Interacting with Databases
+
+    Can use the Python built-in sqlite3 driver or another. Most Python SQL drivers (PyODBC, psycopg2, MySQLdb, pymssql, etc.) return a list of tuples when selecting data from a table.
+    You can pass the list of tuples to the DataFrame constructor, but you also need the column names, contained in the cursor’s description attribute.
+    pandas has a read_frame function in its pandas.io.sql module that simplifies the process. Just pass the select statement and the connection object
+    
+    To make sqlite db in memory:
+         con = sqlite3.connect(':memory:')
+         
+    import pandas.io.sql as sql
+    sql.read_sql('select * from table_name', con)
+    
+Storing and Loading Data in MongoDB
+
+    Documents (dict-like object) stored in MongoDB are found in collections inside databases. Each running instance of the MongoDB server can have multiple databases, and each database can have multiple collections.
+    you connect to the database, then can save whatever to a document within the MongoDB by passing it a dictionary - mongodb_document.save(dict)
+    
+    To read from the MondgoDB into pandas:
+        use the mongodb_document.find({'column':'value'}) method to set a cursor
+    , which will return a list of dictionaries, which you can then read into a pandas DataFrame.
+    
+    

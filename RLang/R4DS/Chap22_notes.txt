@@ -1,0 +1,24 @@
+Chapter 22 Model
+
+The goal of a model is to provide a simple low-dimensional summary of a dataset
+
+This only covers predicate models. not models for data discovery.
+
+22.1 Hypothesis generation vs. hypothesis confirmation:
+
+    Traditionally, the focus of modelling is on inference, or for confirming that an hypothesis is true.
+    
+    To do inference correctly:
+        Each observation can either be used for exploration or confirmation, not both.
+        You can use an observation as many times as you like for exploration, but you can only use it once for confirmation. As soon as you use an observation twice, you’ve switched from confirmation to exploration.
+        
+    To do confirmatory analysis:
+        60% of your data goes into a training (or exploration) set. You’re allowed to do anything you like with this data: visualise it and fit tons of models to it.
+
+        20% goes into a query set. You can use this data to compare models or visualisations by hand, but you’re not allowed to use it as part of an automated process.
+        
+        20% is held back for a test set. You can only use this data ONCE, to test your final model.
+        
+    This partitioning allows you to explore the training data, occasionally generating candidate hypotheses that you check with the query set. When you are confident you have the right model, you can check it once with the test data.
+    
+    

@@ -1,0 +1,283 @@
+Chapter 6:   Learning to Classify Text
+
+How can we identify particular features of language data that are salient for classifying it?
+How can we construct models of language that can be used to perform language processing tasks automatically?
+What can we learn about language from these models?
+
+6.1   Supervised Classification
+
+    Classification is the task of choosing the correct class label for a given input.
+    multi-class classification: each instance may be assigned multiple labels
+    open-class classification: the set of labels is not defined in advance
+    sequence classification: a list of inputs are jointly classified
+    
+    
+    A classifier is called supervised if it is built based on training corpora containing the correct label for each input. During training, a feature extractor is used to convert each input value to a feature set. This feature extractor is then used to create a classifier. Pairs of feature sets and labels are fed into the machine learning algorithm to generate a model. During prediction, the same feature extractor is used to convert unseen inputs to feature sets. These feature sets are then fed into the model, which generates predicted labels.
+    
+    The first step in creating a classifier is deciding what features of the input are relevant, and how to encode those features.
+    A feature extractor function builds a dictionary  containing relevant information about a given word. This will return a Feature Set, which maps Features names to values
+    
+    Prepare a list of examples and corresponding class labels.
+    Use the feature extractor to process the list of examples to obtain a feature set. Then splt that into a training set and test set.  
+    The training set is used to train a new "naive Bayes" classifier.
+    
+    >>classifier = nltk.NaiveBayesClassifier.train(train_set)
+    
+    using classifier on unseen data
+    >>classifier.classify(feature_extractor('new_word'))
+    
+    systematically evaluate the classifier on a much larger quantity of unseen data
+    >>nltk.classify.accuracy(classifier, test_set)
+    
+    to determine which features the classifier found most effective in classification -> will return  likelihood ratios, and can be useful for comparing different feature-outcome relationships.
+    >>> classifier.show_most_informative_features(5)
+    
+    use nltk.classify.apply_features(feature_extractor, data)
+    when working on large corpora - acts like list, but doesn't store all feature sets in memory.
+    
+    Choosing The Right Features:
+    
+        It's common to start with a "kitchen sink" approach, including all the features that you can think of, and then checking to see which features actually are helpful
+        Overfitting problem - If you provide too many features, then the algorithm will have a higher chance of relying on idiosyncrasies of your training data that don't generalize well to new examples.
+        
+        
+        Once an initial set of features has been chosen, a very productive method for refining the feature set is error analysis. First, we select a development set, containing the corpus data for creating the model. This development set is then subdivided into the training set and the dev-test set.
+        Applying the training set generated classifier to the dev-test set, we can generate a list of the errors that the classifier makes.
+        
+        You can then adjust the feature set to eliminate these errors.
+        
+        Each time the error analysis procedure is repeated, we should select a different dev-test/training split, to ensure that the classifier does not start to reflect idiosyncrasies in the dev-test set
+        
+        Only after all that should you use the classifier on the test_set to learn how the classifier will work on new data.
+        
+    Document Classification:
+    
+        To classify documents, you can use a set of all the words and whether they are in the document as the Feature set.
+        e.g. classifying movie reviews, if the document contains the word 'good', it's a positive review
+    
+    Part-of-Speech Tagging:
+    
+        classifying a word on it's own based on length and letters.
+        
+        You can see the decision tree model of the classifier as pseudocode -> classifier.pseudocode(depth=4)
+        
+    Exploiting Context:
+        
+        To exploit context of the word in classification, you need to pass a complete untagged sentence to the feature extractor instead of just the single word.
+        simple classifiers always treat each input as independent from all other inputs
+        
+    Sequence Classification:
+    
+        Used to capture the dependencies between related classification tasks.
+        
+        consecutive classification finds the most likely class label for the first input, then to use that answer to help find the best label for the next input.
+        
+        You can add a history parameter to the feature extractor that maintains the history of classifications for words preceeding the current word
+        
+        You can also look forward (to the right of the current word) and see features of words.
+        
+        This allows us to classify the current word in context of the sentence.
+        
+    Other Methods for Sequence Classification:
+    
+        One shortcoming of this approach is that we commit to every decision that we make.
+        One solution to this problem is to adopt a transformational strategy instead - Brill tagger - will go back and reclassify.
+        Another solution is to assign scores to all of the possible sequences of part-of-speech tags, and to choose the sequence whose overall score is highest - Hidden Markov Models - Maximum Entropy Markov Model, Linear-Chain Conditional Random Field Models.
+         
+6.2   Further Examples of Supervised Classification
+
+    Sentence Segmentation
+
+        essentially modeling for punctuation - look at the code here.
+
+    Recognizing Textual Entailment
+
+        Recognizing textual entailment (RTE) is the task of determining whether a given piece of text T entails another text called the "hypothesis"
+        the relationship between text and hypothesis is not intended to be logical entailment, but rather whether a human would conclude that the text provides reasonable evidence for taking the hypothesis to be true.
+
+        The RTEFeatureExtractor class builds a bag of words for both the text and the hypothesis after throwing away some stopwords, then calculates overlap and difference. It tags them as either 'word' or 'ne' (Named Entity).
+
+6.3   Evaluation
+
+    to decide whether a classification model is accurately capturing a pattern.
+    
+    The Test Set:
+        
+        Test set size in classification depends on the nature of the data.
+        If small number of well-balanced labels amd diverse test set, then can use as few as 100 evaluation instances.
+        If large number of, or infrequent, labels, then test set should be set so that the least frequent label occurs at least 50 times.
+        When large amounts of annotated data are available, use 10% of the overall data for evaluation.
+        
+        If the test set and dev-set are too similar we cannot be confident that the model will generalize.  
+        
+        Try to train and test using a diverse set of data, so as not to be confounding.
+        
+    Accuracy:
+    
+        Accuracy measures the percentage of inputs in the test set that the classifier correctly labeled.
+        When interpreting the accuracy score of a classifier, it is important to take into consideration the frequencies of the individual class labels in the test set.
+        
+    Precision and Recall:
+        
+        In measuring Hypothesis testing results, 
+        
+        Precision - indicates how many of the items that we identified were relevant - True Positive / (True Positive + False Positive).
+        
+        Recall - indicates how many of the relevant items that we identified -  True Positive / (True Positive + False Negative)
+        
+        F-Measure (or F-Score) - combines the precision and recall to give a single score, is defined to be the harmonic mean of the precision and recall - (2 × Precision × Recall) / (Precision + Recall)
+         
+    Confusion Matrices:
+    
+        A confusion matrix is a table where each cell [i,j] indicates how often label j was predicted when the correct label was i.
+        
+        use nltk.ConfusionMatrix(gold, test)
+    
+    Cross-Validation:
+    
+        cross-validation - perform multiple evaluations on different test sets, then to combine the scores from those evaluations
+        Useful if not able to split training and test set well.
+        
+        Subdivide the original corpus into N subsets called folds. For each fold, train on corpus less fold, then test on the fold.
+         The combined evaluation score is based on a large amount of data, and is therefore quite reliable.
+         
+        cross-validation also allows us to examine how widely the performance varies across different training sets
+        
+6.4   Decision Trees
+        
+    machine learning methods for automatically building classification models: decision trees, naive Bayes classifiers, and Maximum Entropy classifiers
+    A decision tree is a simple flowchart that selects labels for input values.
+    It's based on boolean values at each node and resolves in a label (leaf).
+    
+    A decision stump is a decision tree with a single node that decides how to classify inputs based on a single feature. Has one leaf for each possible feature value, which then classifies the input.
+    When building a decision stump, decide which features to use, then build a decision stump for each possible feature, and see which one achieves the highest accuracy on the training data.
+    Then assign a label to each leaf based on the most frequent label for the selected examples in the training set.
+    
+    To grow the decision tree, take the best stumps and replace their least accurate leaves with new stumps. Then train these new stumps on subset of data that would lead to that leaf. - essentially replace the weakest part of your strongest classifier path.
+    
+    Entropy and Information Gain:
+    
+        Several methods for identifying the most informative feature for a decision stump
+        
+        Information gain, measures how much more organized the input values become when we divide them up using a given feature.
+        
+        To measure how disorganized the original set of input values are, we calculate entropy of their labels.  high if the input values have highly varied labels, low if many input values all have the same label.
+        Entropy is defined as the sum of the probability of each label times the log probability of that same label.
+        
+        Labels with high or low frequency do not contribute much to entropy.
+        
+        To determine information gain based on entropy:
+        
+        calc entropy of original input values' labels.
+        Calculate the new entropy for each of the decision stump's leaves, and take the (sample weighted) average of those leaf entropy values.
+        information gain = original entropy - new entropy
+        Higher the information gain, the better job the decision stump does of dividing the input values into coherent groups - build decision trees by selecting d. stumps with highest info gain.
+        
+        
+        Decision trees are especially well suited to cases where many hierarchical categorical distinctions can be made - very effective at capturing phylogeny trees.
+        
+        Limitations:
+            
+            Data becomes sparse at bottom of tree - lower decisions may overfit training set.  solution - stop dividing data at certain point, or grow a full decision tree, then prune decision nodes that do not improve performance on a dev-test.
+            
+            D. Trees force features to be checked in a specific order, even when features may act relatively independently of one another. - causes repeated nodes between branches - may be able to algorithmically float most important nodes to the top.
+            
+            Also not good at using weak label predictors - they're usually at the bottom of the tree, where there's little data left. If we could instead look at the effect of these features across the entire training set, then we might be able to make some conclusions about how they should affect the choice of label.
+            
+        
+    6.5   Naive Bayes Classifiers
+    
+        The naive Bayes classifier model defines a parameter for each label, specifying its prior probability, and a parameter for each (feature, label) pair, specifying the contribution of individual features towards a label's likelihood.
+    
+        To choose a label for an input value, the naive Bayes classifier begins by calculating the prior probability of each label, which is determined by checking frequency of each label in the training set. The contribution from each feature is then combined with this prior probability, to arrive at a likelihood estimate for each label. The label whose likelihood estimate is the highest is then assigned to the input value
+        
+        Individual features make their contribution to the overall decision by "voting against" labels that don't occur with that feature very often. The likelihood score for each label is reduced by multiplying it by the probability that an input value with that label would have the feature. - The greater the probability of the label as indicated by the frequency within the group, the less the likelihood score will be reduced relative to the other labels - assumes feature probs are all independent.
+        
+        Underlying Probabilistic Model:
+        
+            Naive Bayes Assumption -  every input value is generated by first choosing a class label for that input value, and then generating each feature, entirely independent of every other feature
+            We can calculate an expression for P(label|features), then maximize that for new inputs - P(new input label | features)
+            P(label|features) = P(features and label)/P(features)
+            P(features) will be the same for every choice of label - so we can just calc P(features and label).
+            Label Likelihood = P(features and label) = P(label) × P(features|label)
+            Because features are independent of one another, you can find the prob of each individual feature:
+            	P(features, label) = P(label) * Product of P(f|label) for f in features
+                each P(f|label) is the contribution of a single feature to the label likelihood.
+            
+        Zero Counts and Smoothing:
+            
+            Features with zero occurences will cause P(f|label) to be 0 and never be subsequently assigned to inputs. You should use smoothing to mitigate this - Expected Likelihood Estimation or Heldout estimation.
+        
+        Non-Binary Features:
+        
+            Use binning for non-binary features, or use regression methods to model the probabilities of numeric features - replace feature with a function that produces a feature.
+            
+        The Naivete of Independence:
+        
+            Using dependent features leads to double counting.
+            For features like these, the duplicated information may be given more weight than is justified by the training set.
+            
+        The Cause of Double-Counting:
+        
+            during training, feature contributions are computed separately; but when using the classifier to choose labels for new inputs, those feature contributions are combined.
+            solution - consider the possible interactions between feature contributions during training, and use those interactions to adjust the contributions that individual features make.
+            
+            Likelihood of a label using weights(parameters):
+            	P(features, label) = w[label] × Product of [w[f, label] for f in features]
+        
+6.6   Maximum Entropy Classifiers
+
+    Similar to Naive Bayes classifier. Looks for set of paramenters(weights) that maximizes the total likelihook of the training corpus.
+    
+    Total Likelihood Maximizing Features:
+        P(features) = sum([P(label(x)| features(x)) for x in corpus])
+    
+    Prob of label given features:
+	    P(label|features) = P(label, features) / sum( [P(label, features) for label in labels] )
+	
+	No way to directly calculate the model parameters that maximize the likelihood of the training set.
+	
+	Maximum Entropy classifiers choose the model parameters using iterative optimization techniques - random choice, then refinement. Slow on large training sets, number of features, and labels.
+	Don't use Generalized Iterative Scaling (GIS) or Improved Iterative Scaling (IIS). Use Conjugate Gradient (CG) and the BFGS optimization methods.
+	
+	The Maximum Entropy Model:
+	
+	    Calculates the likelihood of each label for a given input value by multiplying together the parameters that are applicable for the input value and label.
+	    Up to the user to decide what combinations of labels and features should receive their own parameters. 
+	    Each combination of labels and features that receives its own parameter is called a joint-feature - property of labeled value.
+	    
+	    The score assigned to a label for a given input:
+	        P(input, label) = Product( [w[join-feature] for joint-feature in joint-features(input, label)])
+	        
+	        it's essentially the same as the naive bayes -the product of the parameters associated with the joint-features that apply to that input and label
+	        
+	   
+	Maximizing Entropy:
+        
+        We should build a model that captures the frequencies of individual joint-features, without making any unwarranted assumptions - then among the distributions that are consistent with what we know, we should choose the distribution whose entropy is highest.
+        the Maximum Entropy model calculates the "empirical frequency" of that feature — i.e., the frequency with which it occurs in the training set. It then searches for the distribution which maximizes entropy, while still predicting the correct frequency for each joint-feature.
+        
+    Generative vs Conditional Classifiers:
+    
+        Both (but conditional is better):
+        
+            What is the most likely label for a given input?
+            How likely is a given label for a given input?
+        
+        
+        Only Generative:
+        
+            What is the most likely input value?
+            How likely is a given input value?
+            How likely is a given input value with a given label?
+            What is the most likely label for an input that might have one of two values (but we don't know which)?
+            
+6.7   Modeling Linguistic Patterns
+
+    What do models tell us?:
+        
+        Descriptive models capture patterns in the data but they don't provide any information about why the data contains those patterns. - correlations in data - good for predictions
+        Explanatory models attempt to capture properties and relationships that cause the linguistic patterns. - causal relationships
+        
+        
+        

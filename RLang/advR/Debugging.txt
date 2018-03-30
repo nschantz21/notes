@@ -1,0 +1,29 @@
+Debugging, condition handling, and defensive programming
+
+Communicating anticipated problems (like incorrect input type) to the user is the job of conditions: errors, warnings, and messages.
+
+Fatal errors - stop() - force all execution to terminate. use when no way for function to continue.
+Warnings - warning() - display potential problems
+Messages - message() - give info that can be easily surpressed by the user
+
+Don't use print() or cat() because they are not conditions and ca't use any of the condition handling tools.
+
+In general, you want to fast-fail, to raise an error as soon as something goes wrong. In R, this takes three particular forms: checking that inputs are correct, avoiding non-standard evaluation, and avoiding functions that can return different types of output.
+
+Debugging techniques
+
+    1. Realise that you have a bug
+    2. Make it repeatable
+        You need to be able to reproduce it on command.  Use binary search to find the minimal part of code producing the bug - with each step in the search the amount of code will halve.
+        If you’re using automated testing, this is also a good time to create an automated test case. If your existing test coverage is low, take the opportunity to add some nearby tests to ensure that existing good behaviour is preserved. This reduces the chances of creating a new bug.
+    3. Figure Out What it is
+        Generate hypotheses, design experiments to test them, and record your results.
+    4. Fix it and test it
+        Use automated testing this help to ensure that you’ve actually fixed the bug, it also helps to ensure you haven’t introduced any new bugs in the process. OR carefully record the correct output and check against the inputs that previously failed.
+
+Debugging Tools
+
+    Determining the sequence of calls:
+        call stack - the sequence of calls that lead up to an error.
+        
+        

@@ -1,0 +1,152 @@
+Time Series
+
+
+Date and Time Data Types and Tools
+
+    Use the datetime module. 
+    date Store calendar date (year, month, day) using the Gregorian calendar.
+    time Store time of day as hours, minutes, seconds, and microseconds
+    datetime Stores both date and time
+    timedelta Represents the difference between two datetime values (as days, seconds, and microseconds)
+
+    to convert strings to dates use datetime.strptime.
+        datetime.strptime(value, '%Y-%m-%d') # or whateverformat
+    
+    To parse from common string formats to datetime, use the parser.parse method in the datutil package:
+        from dateutil.parser import parse
+        parse('2011-01-03')
+        datetime.datetime(2011, 1, 3, 0, 0)
+        
+    pandas.to_datetime() automatically parses arrays of string dates
+
+Time Series Basics
+
+    When you index by datetime, these datetime objects have been put in a DatetimeIndex, and the Pandas Series is now of type TimeSeries
+    A Timestamp can be substituted anywhere you would use a datetime object. Additionally, it can store frequency information (if any) and understands how to do time zone conversions and other kinds of manipulations.
+    
+Indexing, Selection, Subsetting
+
+    You can select by year or day even if the timeseries is denominated in minutes or less.  Because most time series data is ordered chronologically, you can slice with timestamps not contained in a time series to perform a range query - produces a view.  truncate method also slices.
+    
+Time Series with Duplicate Indices
+
+    We can tell that the index is not unique by checking its is_unique property.
+    to aggregate the data having non-unique timestamps, use groupby and pass level=0
+    
+    if(!DataFrame.index.is_unique()):
+        DataFrame.groupby(level = 0)
+    
+Date Ranges, Frequencies, and Shifting
+
+    use the .resample() method for consistent index frequency.
+    
+Generating Date Ranges
+
+    use pandas.date_range()
+    to generate a set of timestamps normalized to midnight as a convention, use the normalize option
+    
+Frequencies and Date Offsets
+
+    Frequencies in pandas are composed of a base frequency and a multiplier. For each base frequency, there is an object defined generally referred to as a date offset.
+    use pandas.tseries.offsets module for the offsets
+    pass the base frequency to the pandas.date_range(freq=????)
+    
+    good for setting expiry dates for options
+        rng = pd.date_range('1/1/2012', '9/1/2012', freq='WOM-3FRI')
+        
+Shifting (Leading and Lagging) Data
+
+    "Shifting" refers to moving data backward and forward through time. Both Series and DataFrame have a shift method for doing naive shifts forward or backward, leaving the index unmodified.
+    A common use of shift is computing percent changes in a time series or multiple time series as DataFrame columns.
+            ts / ts.shift(1) - 1
+    You can also shift based on frequency - good if you know the frequency of the timeseries.
+
+    Shifting dates with offsets
+    
+        Anchored offsets can explicitly "roll" dates forward or backward using their rollfor ward and rollback methods, respectively.
+        A clever use of date offsets is to use these methods with groupby, but you can just resample - it's easier.
+
+Time Zone Handling
+    
+    use UTC - it's best. use the pytz module
+
+    Localization and Conversion
+        
+        By default, time series in pandas are time zone naive. so you have to pass a tz argument when making a date_range or you can use the tz_localize method to set it to UTC from none.
+        to convert to UTC from another tz: 
+            Series.tz_convert('UTC')
+        
+Periods and Period Arithmetic
+
+    Periods represent time spans, like days, months, quarters, or years. The Period class represents this data type, requiring a string or integer and a frequency
+    Regular ranges of periods can be constructed using the period_range function
+        pd.period_range(2017, freq='M')
+    
+    The PeriodIndex class stores a sequence of periods and can serve as an axis index in any pandas data structure.
+
+    You can convert and shit, but resampling can accomplish the same thing more easily, although this does create a second index, which can be useful for regular groupby functions.
+    
+Resampling and Frequency Conversion
+
+    pandas objects are equipped with a resample method, which is the workhorse function for all frequency conversion.
+    
+    When downsampling, keep in mind which side of each interval is closed and how to label each aggregated bin - with the begin or end.
+    you might want to shift the result index by some amount, say subtracting one second from the right edge to make it more clear which interval the timestamp refers to. - use the loffset parameter of the resample method.
+    
+    Open-High-Low-Close (OHLC) resampling
+        good for fincial trade data.
+        
+        Series.resample('5min', how='ohlc')
+    
+    Upsampling
+    
+        when upsampling, you can fill missing data, specify how it's filled, and limit how much is filled
+        
+    Resampling Periods:
+        
+        In downsampling, the target frequency must be a subperiod of the source frequency.
+        In upsampling, the target frequency must be a superperiod of the source frequency.
+        
+Time Series Plotting
+    
+    You can just call the plot method on a timeseries dataset.  You can slice for a specific timespan, or resample to aggregated data. 
+    
+        Series.plot()
+        Series.ix['2017'].plot()
+        Series.ix['2015' : '2017'].plot()
+        reSeries = Series.resample('Q-DEC', fill_method = 'ffill')
+        reSeries.ix['2015':].plot() # plot slice of resampled data
+        
+Moving Window Functions
+
+    use the rolling method, pass it a window and call the aggrgating function(e.g. mean()) on the rolling object.
+    
+Exponentially-weighted functions
+
+    An alternative to using a static window size with equally-weighted observations is to specify a constant decay factor to give more weight to more recent observations.
+    There are a couple of ways to specify the decay factor, a popular one is using a span, which makes the result comparable to a simple moving window
+    Since an exponentially-weighted statistic places more weight on more recent observations, it "adapts" faster to changes compared with the equal-weighted version.
+    
+    use the Series.ewm(span) method
+    
+Binary Moving Window Functions
+
+    When comparing two time series you can compute the correlation using the corr method of a rolling object.
+    To compute for each column in a DF:
+        corr = x.rolling(window).corr(y)
+    
+User-Defined Moving Window Functions
+
+    you can use the apply method on rolling objects.
+    
+    to get percentile rank of value over sample;
+        from scipy.stats import percentileofscore
+        score_at_2percent = lambda x: percentileofscore(x, 0.02)
+        result = Series.rolling(250).apply(score_at_2percent)
+        result.plot()
+        
+    could tell you where the stock price is relative to the high.
+
+Performance and Memory Usage Notes
+
+    It's all views, so there isn't a ton of memory usage. functions are super optimized, but could be even moreso.

@@ -1,0 +1,31 @@
+CAPE: Using Its Variants to Predict the Returns from Investing in the S&P 500 Index
+
+The CAPE (cyclically adjusted price-to-earnings ratio) is the ratio of real price of the S&P500 index to the average of real earnings over the previous ten years.  Used to assess likely future returns from equities over timescales of 10 to 20 years, with higher than average CAPE values implying lower than average long-term annual average returns.
+CAPE does not take into account prevailing risk free interest rate.
+
+To deflate, divide by the avg. CPI over the previous year.
+
+The problem:
+    
+    The recent fall in the ratio of earnings that are paid out as dividends, the payout ratio, has shrunk the ratio of past to current earnings and decreased the CAPE, so that current predictions based on CAPE are biased downwards.
+
+Solution:
+    
+    Alternative method of valuation and differnt evaluation periods.
+    
+
+Evaluation Period:
+    
+    using 20 year look back gives a higher R-squared.  You can under weight the past for more relevancy for more recent events, or you can over weight the past to account for the fact that returns are compounding.
+
+Use cumulative returns rather than rates of returns.  regression analysis that predicts cumulative returns rather than rates of return provides more optimistic expected rates of return.  This reflects the power of compounding.
+
+Peak earnings should play a role in calculating variants of CAPE to predict returns. Thus, temporary short-falls in earnings are less serious problems than previously thought. To do this, CAPE calculated using the series for previous peak earnings rather than current earnings.  
+
+Temporal weighting of returns has limited to no effect.
+
+Tobin's Q is the ratio between a physical asset's market value and its replacement value. ratio of stock price to book value, with both measured in real terms. Using Tobin's Q as a predictor of equity returns is less than the CAPE that reinvests dividend and is weighted by time and uses peaks.  Tobin's Q estimate is between non-dividend version weighted by time and using peaks.
+
+Essentially Tobin's Q is much less optimistic than any of the CAPEs.
+
+The Siegel predictor is the most optimistic of the modified CAPE methods.

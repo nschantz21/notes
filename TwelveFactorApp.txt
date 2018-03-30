@@ -1,0 +1,76 @@
+Twelve Factor App
+
+I. Codebase
+    
+    One Codebase (repo) per app. Each deployment can be of a different version, but they all share the same codebase.
+    
+II. Dependencies
+
+    Explicitly Declare and isolate dependencies. Never depend on system-wide packages. Simplifies setup for developers new to the app. Do not rely on the implicit existence of any system tools - e.g. curl. If the app needs to shell out to a system tool, that tool should be vendored into the app
+    
+III. Config
+
+    Store config in the environment. Includes anything that is likely to vary between deploys - DBs, credentials, ENV variables. Don't store as constants in code.
+    Test - Could you make it open souce at any moment without leaking info?
+    Use config files not checked into version control or store in Environment variables (better). Do not group env variables by deployment - doesn't scale well.
+    Make each Env variable independent.
+    
+IV. Backing Services
+
+    Treat Backing Services (service that app consumes over the network as part of its normal operation) as attached resources. Make no distinction between local and third party services - everything should be handled in the ENV config.
+
+V. Build, Release, Run
+
+    Strictly separate build and run stages.
+    DAG: Build -> Relase -> Run
+    Build - code at a commit stage - fetches vendors dependencies and compiles binaries and assets. Initiated by dev whenever new code deployed.
+    Release - Build + config. ready for execution in execution environment. Every release should always have a unique release ID. Any change must create a new release.
+    Run - runs in execution environment by launching app processes - can happen automatically (server/crash/reboot) - should be as simple as possible
+    
+VI. Processes
+
+    Execute the app as one or more stateless processes in the execution env.
+    Processes are stateless and shared-nothing (each node is independent and self-sufficient). Persistent data is stored in stateful backing service.
+    Never assume anything stored in cache or on disk will persist.
+    Don't use web sticky-sessions.  Session data is for time-expiration datastore.
+    
+VII. Port Binding
+    
+    When web apps are executed inside a webserver container.
+    Export Services via port binding. Do not rely on runtime injection of a webserver into the execution environment to create a web-facing service. Export HTTP as a service by binding to a port, and listening to requests coming in on that port.
+    Use dependency declaration to add a webserver library to the app.
+    
+VIII. Concurrency
+
+    Scale out via the process model.
+    Assign each type of work a process type  - e.g. HTTP request handled by web process
+    App must be able to span multiple processes running on multiple physical machines.
+    Never deamonize or write PID files. Rely on the OS's manager (systemd) to manage output streams, respond to crashed processes, and handle user-initiated restarts and shutdowns.
+    
+IX. Disposability
+
+    Maximize robustness with fast startup and graceful shutdown of processes.
+    Facilitates elastic scaling, rapid deployment of code or config changes, and robustness of production deploys.
+    Graceful when recieve SIGTERM, and robust against sudden death.
+
+X. Dev/prod parity
+    
+    Keep development, staging, and production as similar as possible.
+    Minimize gaps:
+        Time gap: Time between development and deployment to production
+        personnel gap: Developers and Deployment Engineers
+        tools gap: Environment/Backing Services
+    Don't use light-weight in dev and heavy-weight in prod. Keep it all the same or similar with docker.
+    All deploys of the app should use the same type and version of the backing services.
+    
+XI. Logs
+    
+    Treat logs as event streams.
+    Don't concern yourself with routing or storage of the output stream. Write unbuffered to stdout.
+    Stream will be captured by execution environment. Then it can be saved to file or sent to a log indexing and analysis system.
+
+XII. Admin processes
+
+    Run admin/management tasks as one-off processes.
+    One-off admin processes should be run in an identical environment as the regular long-running processes of the app. Run against a release, using the same codebase and config as any process run against that release. Ship with application code to avoid synchronization issues.
+    

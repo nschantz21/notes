@@ -1,0 +1,52 @@
+A Modest Proposal:
+    
+    Software Components:
+
+        Docker - this is quite complicated and although would be ideal, is perhaps not a reality in the near future
+        Python 2.7 - potentially start using 3.6, but it might be messy
+        R  3.4 - this seems to update every couple of months
+        R Studio - Server for presentation - can use Shiny instead - or just remote in for an interactive presentation
+        C++/CUDA - NVIDIA Titan V - JK this is ridiculous
+        git/GitHub - GitHub apparently not secure, drawback of proprietary tech
+        Linux - at least as host and as much as possible
+        PostgresSQL - difficult to learn, but will support concurrency
+        zipline - backtesting
+        pyfolio - performance and risk analysis of financial portfolios
+        
+        http://gitreal.codeschool.com/levels/1#
+        
+    Enviroment:
+        Three isolated docker environments. possibly on the same host and separated using subnets.
+    
+    Objectives:
+        
+        To create stable, packaged, distributable software tools for financial modeling and portfolio management.
+    
+    Usage:
+    
+        The software tools will be accessible on three levels.
+            Source: direct access to package source code
+            Package: access to latest stable release
+            WebApp: web app interface built on latest stable release
+    
+    Users:
+
+        Three levels of interaction
+            Dev: access to all levels
+            Quant: access to Package and WebApp
+            Other: access to WebApp
+
+    Tools:
+
+        Model creator/manager - this will be the bulk of the functionality and the centerpiece of the package
+
+    Issues:
+
+        Keeping up integration with unstable dependencies - blpapi, pandas, etc.
+        Limited resources in development environment.
+        large size of code-base will hard to maintian and create unstable software.
+    
+        inexperienced dev team
+        
+        Possible solutions:
+            make project/software open source like pandas - this wil allow for greater community involvement and expertise.  The dev community can pick it up and carry on if we decide to stop maintaining it.  we can openly collaborate/integrate other open libraries(pyfolio, zipline, QuantLib)

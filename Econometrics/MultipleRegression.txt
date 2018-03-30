@@ -1,0 +1,54 @@
+Multiple Regression Analysis
+
+Multiple regression analysis is used for testing hypotheses about the relationship between a dependent variable Y and two or more independent variables X and for prediction.  additional assumption (to those of the simple regression model) is that there is no exact (perfect) linear relationship between the X values.
+
+    The coefficients measure the change in Y for a unit change in X1 while holding X2 constant. The Estimators are the partial regression coefficients. 
+
+    The True independence of input variables is unlikely in the real world.  If two or more explanatory variables are highly but not perfectly linearly correlated, then OLS parameter estimates can be calculated, but the effect of each of the highly linearly correlated variables on the explanatory variable cannot be isolated.
+
+TESTS OF SIGNIFICANCE OF PARAMETER ESTIMATES
+
+    We need the variance of the estimates - which in turn requires the variance of the population.  Since this is unknown, we use the residual variance as an unbiased estimate of the population variance.
+    
+    Then Test Hypotheses about the parameter coefficients.
+    
+    Intercept parameter b0 is usually not of primary concern and a test of its statistical significance can be omitted.
+    
+    Construct confidence intervals for the parameters using the parameter estimates and the estimate standard errors.
+
+THE COEFFICIENT OF MULTIPLE DETERMINATION
+
+    coefficient of multiple determination R^2 is defined as the proportion of the total variation in Y "explained" by the multiple regression of Y on X1 and X2,
+    To factor in the reduction in the degrees of freedom as additional independent or explanatory variables are added, use the adjusted R^2.
+    
+    Compare the regular R^2 to the adjusted R^2 to see the marginal explanatory power of a variable.
+    
+TEST OF THE OVERALL SIGNIFICANCE OF THE REGRESSION - Hypothesis Testing
+    
+    Null Hypothesis is that none of the independent variables have explanatory power, and the alternative hypothesis is that at least one has explanatory power.
+    
+    The overall significance of the regression can be tested with the ratio of the explained to the unexplained variance (F-Ratio). This follows an F distribution with k - 1 and n - k degrees of freedom, where n is number of observations and k is number of parameters estimated
+    Use the F-Ratio to test the hypothesis. A "high" value for the F statistic suggests a significant relationship between the dependent and independent variables, leading to the rejection of the null hypothesis that the coefficients of all explanatory variables are jointly zero.
+    F-stat can be "large" and yet none of the estimated parameters to be statisticaly significant - when independent variables are highly correlated.
+    The F test is often of limited usefulness because it is likely to reject the null hypothesis, regardless of whether the model explains "a great deal" of the variation of Y.
+    The F ratio, as a test of significance of the explanatory power of all independent variables jointly, is roughly equivalent to testing the significance of the R2 statistic
+    
+    In addition, the F ratio can be used to test any linear restriction of regression parameters
+    
+    
+PARTIAL-CORRELATION COEFFICIENTS
+
+    The partial-correlation coefficient measures the net correlation between the dependent variable and one independent variable after excluding the common influence of (i.e., holding constant) the other independent variables in the model.  This is done by removing the linear relationship between one of the independent variables and then modeling on the residuals of the other variables.
+    Used to determine the relative importance of the different explanatory variables in a multiple regression.
+    partial correlation coefficients give an ordinal, not a cardinal, measure of net correlation, and the sum of the partial correlation coefficients between the dependent and all the independent variables in the model need not add up to 1.
+
+
+Steps:
+(a) Fit an OLS regression to these observations.
+(b) Test at the 5% level for the statistical significance of the slope parameters.
+(c) Find the unadjusted and adjusted coefficient of multiple correlation. 
+(d) Test for the overall significance of the regression.
+(e) Find the partial correlation coefficients and indicate which independent
+variable contributes more to the explanatory power of the model. 
+(f) Report all the results in summary and round off all calculations to four decimal places.
+

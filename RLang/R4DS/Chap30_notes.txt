@@ -1,0 +1,14 @@
+Chapter 30 R Markdown workflow
+
+    Ensure each notebook has a descriptive title, an evocative filename, and a first paragraph that briefly describes the aims of the analysis.
+
+    Use the YAML header date field to record the date you started working on the notebook:
+        date: 2016-08-23
+        
+    Before you finish for the day, make sure you can knit the notebook (if you’re using caching, make sure to clear the caches). That will let you fix any problems while the code is still fresh in your mind.
+    
+    If you discover an error in a data file, never modify it directly, but instead write code to correct the value. Explain why you made the fix.
+    
+    Use packrat or checkpoint to make your code reproducible in the long-run.
+    
+    Store analysis notebooks in individual projects and come up with a good naming scheme.

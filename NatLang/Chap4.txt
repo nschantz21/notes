@@ -1,0 +1,70 @@
+Chapter 4.6: Program Development
+
+Structure of a Python Module:
+    First write the Docstring, followed by import statements, then global variables, then functions, then classes.
+    
+    Underscored names will not be imported when using import *
+    you can also optionally list the externally accessible names of a module using the special __all__ built-in variable.
+    
+Multi-Module Programs:
+    
+    Break the program into modules based on functionality.
+    
+Sources of Error:
+
+    input is different than expected.
+    functions behave different than expected.
+    understanding of python semantic may be at fault - order of operations etc.
+    
+Debugging Techniques:
+
+    Localize the problem by adding print statements to the program, showing the value of important variables, and showing how far the program has progressed.
+    If the program depends on input data, try to reduce this to the smallest size while still producing the error.
+    Recreate the situation using the interactive command line.
+    Read the Docs to really understand what's happening.
+    
+    use pdb module in interpreter to get the debugger prommpt
+        import pdb
+        pdb.run(my_module.my_function())
+        
+Defensive Programming:
+
+    Write your code in smaller pieces and add assertions.
+    Assert properties of a variable - i.e. type() if necessary
+    
+    Once you think you've found the bug, view your solution as a hypothesis. Try to predict the effect of your bugfix before re-running the program.
+    Don't just blindly change the code and hope it will work; For each change articulate a hypothesis about what is wrong and why the change will fix the problem. Then undo the change if the problem was not resolved.
+    
+    As you develop your program, extend its functionality, and fix any bugs, it helps to maintain a suite of test cases. This is called regression testing. 
+    Python provides a simple regression testing framework in the form of the doctest module. It Searches a file of code or documentation for blocks of text that look like an interactive Python session, executes the Python commands it finds, and tests that their output matches the output supplied in the original file.
+    The doctest module is also useful for ensuring that your software documentation stays in sync with your code.
+    
+================================================================================
+
+4.7   Algorithm Design:
+
+    Divide and conquer
+    
+Recursion:
+    
+    Can use recursion to get the size of a synset hypernym hierarchy.
+    
+    Can use recusrion to construct a Letter trie - used for indexing a lexicon one letter at a time.  
+    
+    Despite the simplicity of recursive programming, it comes with a cost. Each time a function is called, some state information needs to be pushed on a stack, so that once the function has completed, execution can continue from where it left off. For this reason, iterative solutions are often more efficient than recursive solutions.
+    
+Space-Time Tradeoffs:
+
+    A more subtle example of a space-time tradeoff involves replacing the tokens of a corpus with integer identifiers. We create a vocabulary for the corpus, a list in which each word is stored once, then invert this list so that we can look up any word to find its identifier. Each document is preprocessed, so that a list of words becomes a list of integers. Any language models can now work with integers.
+    
+    Another example of a space-time tradeoff is maintaining a vocabulary list. If you need to process an input text to check that all words are in an existing vocabulary, the vocabulary should be stored as a set, not a list. The elements of a set are automatically indexed, so testing membership of a large set will be much faster than testing membership of the corresponding list.
+    
+Dynamic Programming:
+
+    Dynamic programming is used when a problem contains overlapping sub-problems. Instead of computing solutions to these sub-problems repeatedly, we simply store them in a lookup table.
+    It works by filling up a table (called lookup) with solutions to all smaller instances of the problem, stopping as soon as we reach the value we're interested in. At this point we read off the value and return it. Crucially, each sub-problem is only ever solved once.
+    
+    This is done through a top-down approach. Using a memoize function that stores Caches a function's return value each time it is called. If called later with the same arguments, the cached value is returned (not reevaluated).
+    
+    So now wrap the sub problems in the memoization function with a decorator.
+        You can find some simple memoization functions online.

@@ -1,0 +1,145 @@
+Chapter 21 Iteration
+
+21.2 For loops
+    
+    You must first allocate sufficient space for the output - create a vector. The vector object takes a type and size argument.
+    Then delcare the iterator in the "for" line; use seq_along instead of length() for iteration ranges.  Then make the body do whatever you want.
+    
+    output <- vector("double", ncol(df)) # output
+    for ( i in seq_along(df)) {          # sequence
+        output[[i]] <- median(df[[i]])   # body
+    }
+    
+    output
+
+21.3 For loop variations
+
+    There are four variations on the basic theme of the for loop:
+
+        Modifying an existing object, instead of creating a new object.
+        Looping over names or values, instead of indices.
+        Handling outputs of unknown length.
+        Handling sequences of unknown length.
+    
+    21.3.1 Modifying an existing object
+
+        It’s better to use [[ even for atomic vectors because it makes it clear that I want to work with a single element.
+        
+    21.3.2 Looping patterns
+        
+        You can loop over elements directly (for x in xs) - most useful if you only care about side effects, like plotting, but difficult tosave output effiecently
+        Loop over names (for nm in names(x)) - useful if you want to access the element and use the name.
+        Iteration over the numeric indices (seq_along(x)) is the most general form, because given the position you can extract both the name and the value.
+        
+    21.3.3 Unknown output length
+        
+        if you're not sure how long the output will be for each iteration of a finite number of inputs.
+        The most effient way is to make a vector of lists, then flatten the vector using unlist() or (better yet) purrr::flatten_dbl()
+        
+        You might be generating a big data frame. Instead of sequentially rbind()ing in each iteration, save the output in a list, then use dplyr::bind_rows(output) to combine the output into a single data frame.
+        
+        Whenever you see this pattern, switch to a more complex result object, and then combine in one step at the end.
+        
+    21.3.4 Unknown sequence length
+        
+        use a while loop.
+        
+        while (condition){
+            do shit
+        }
+        
+21.4 For loops vs. functionals
+    
+    functionals reduce repeated code by allowing you to pass function pointers to other functions.
+    
+    The goal of using purrr functions instead of for loops is to allow you break common list manipulation challenges into independent pieces:
+
+        How can you solve the problem for a single element of the list? Once you’ve solved that problem, purrr takes care of generalising your solution to every element in the list.
+        
+        If you’re solving a complex problem, how can you break it down into bite-sized pieces that allow you to advance one small step towards a solution? With purrr, you get lots of small pieces that you can compose together with the pipe.
+    
+    This structure makes it easier to solve new problems. It also makes it easier to understand your solutions to old problems when you re-read your old code.
+    
+21.5 The map functions
+
+    Loops over a vector, does something, and saves the result.
+    
+    The chief benefits of using functions like map() is not speed, but clarity: they make your code easier to write and to read.
+    
+    There are different map functions based on the return type:
+        map_*(input_data, function, ...) - you can pass additional kwarg arguments to the function.
+        
+    
+    21.5.1 Shortcuts
+    
+        The syntax for creating an anonymous function in R is quite verbose so purrr provides a convenient shortcut: a one-sided formula.
+        ~your_function(arguments)
+        
+        use "." as a pronoun: it refers to the current list element
+            
+            models <- mtcars %>% 
+            split(.$cyl) %>% 
+            map(~lm(mpg ~ wt, data = .))
+        
+    21.5.2 Base R
+    
+        apply, lapply, sapply, and vapply are inconsistent.
+        
+        Use the purrr functions instead.
+    
+21.6 Dealing with failure
+
+    If an operation fails in map(), there will be no output. use safely() to fix.
+    
+    safely() is an adverb: it takes a function (a verb) and returns a modified version.  the modified function will never throw an error. Instead, it always returns a list with two elements:
+
+            result is the original result. If there was an error, this will be NULL.
+            error is an error object. If the operation was successful, this will be NULL.
+    
+    Use this instead of try().  safely() is designed to work with map.
+    Use purrr::transpose() to get two lists: one of all the errors and one of all the output.
+    
+    possibly() always succeeds. It’s simpler than safely(), because you give it a default value to return when there is an error.
+    quietly() performs a similar role to safely(), but instead of capturing errors, it captures printed output, messages, and warnings.
+    
+21.7 Mapping over multiple arguments
+
+    use map2() - iterates over two vectors in parallel.  
+    purrr::pmap() takes a list of arguments
+    
+    If you don’t name the elements of list, pmap() will use positional matching when calling the function. That’s a little fragile, and makes the code harder to read, so it’s better to name the arguments.
+    
+    store pmap results in a dataframe.
+    
+    21.7.1 Invoking different functions
+        
+        Use invoke_map() to vary the function itself.
+        The first argument is a list of functions or character vector of function names. The second argument is a list of lists giving the arguments that vary for each function. The subsequent arguments are passed on to every function. use tribble() to make creating these matching pairs a little easier.
+            
+21.8 Walk
+    
+    walk(), walk2(), pwalk()
+    Walk is an alternative to map that you use when you want to call a function for its side effects, rather than for its return value.
+    
+    All invisibly return .x, the first argument. This makes them suitable for use in the middle of pipelines.
+    
+21.9 Other patterns of for loops
+
+    21.9.1 Predicate functions
+    
+        A number of functions work with predicate functions that return either a single TRUE or FALSE.
+
+        keep() and discard() keep elements of the input where the predicate is TRUE or FALSE respectively.
+        
+        some() and every() determine if the predicate is true for any or for all of the elements.
+        
+        detect() finds the first element where the predicate is true; detect_index() returns its position.
+        
+        head_while() and tail_while() take elements from the start or end of a vector while a predicate is true.
+    
+    21.9.2 Reduce and accumulate
+    
+        
+        reduce() takes a “binary” function (i.e. a function with two primary inputs), and applies it repeatedly to a list until there is only a single element left. 
+        
+        Accumulate is similar but it keeps all the interim results. You could use it to implement a cumulative sum.

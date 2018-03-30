@@ -1,0 +1,137 @@
+Advanced NumPy
+
+    ndarray Object Internals
+        
+        For an array this would mean that only some of the elements are present, like just every 10th element. You can then save space by not storing the empty elements in between.
+        A dense array would be one where many, if not all, elements are present so there is no empty space between the elements.
+        Every array object is a strided view on a block of data.
+        
+        Strides are the critical ingredient in constructing copyless array views
+        
+    NumPy dtype Hierarchy
+    
+        the dtypes have superclasses such as np.integer and np.floating which can be used in conjunction with the np.issubd type function. You can see all of the parent classes of a specific dtype by calling the type’s mro method.
+        
+        
+    Advanced Array Manipulation
+    
+        Reshaping Arrays
+        
+            use the data.reshape() method to reshape an array.  pass -1 as a parameter for the dimension to be inferred from the data.
+            
+            use .flatten() or .ravel() to reshape from one-dimensional to multi-dimensional array. The flatten method behaves like ravel except it always returns a copy of the data.
+            
+        C versus Fortran Order
+        
+            C / row major order: traverse higher dimensions first
+            Fortran / column major order: traverse higher dimensions last
+            
+            Can pass 'C' or 'F' to the order parameter of reshape methods.
+            
+        Concatenating and Splitting Arrays
+        
+            numpy.concatenate takes a sequence (tuple, list, etc.) of arrays and joins them together in order along the input axis.
+            
+            There are two special objects in the NumPy namespace, r_ and c_, that make stacking arrays more concise
+            
+        Repeating Elements: Tile and Repeat
+        
+            repeat and tile methods
+            
+        Fancy Indexing Equivalents: Take and Put
+        
+            use integer array to select by index.  then you can pass that to the take or put methods to alter the array.
+            
+    Broadcasting
+    
+        Broadcasting describes how arithmetic works between arrays of different shapes.
+        
+        Two arrays are compatible for broadcasting if for each trailing dimension (that is, starting from the end), the axis lengths match or if either of the lengths is 1. Broadcasting is then performed over the missing and / or length 1 dimensions.
+    
+        I think these are just general linear algebra rules for matrix operations
+        
+        Broadcasting Over Other Axes
+        
+            you may have to reshape your data to perform broadcasting operations.  Even if it's a one dimentional array, you might have to add additional axes -> (4,1) instead of (4,).  you can use reshape method or np.newaxis attribute along with "full" slices to insert the new axis.
+            
+            # To generalize demeaning over an axis without sacrificing performance
+                def demean_axis(arr, axis=0):
+                    means = arr.mean(axis)
+                    # This generalized things like [:, :, np.newaxis] to N dimensions
+                    indexer = [slice(None)] * arr.ndim
+                    indexer[axis] = np.newaxis
+                    return arr - means[indexer]
+        
+            you can also set values via array indexing by broadcasting.
+            
+    Advanced ufunc Usage
+    
+        ufunc Instance Methods
+        
+            reduce(x) Aggregate values by successive applications of the operation
+            
+            accumulate(x) Aggregate values, preserving all partial aggregates
+            
+            reduceat(x, bins) "Local" reduce or "group by". Reduce contiguous slices of data to produce aggregated array.
+            
+            outer(x, y) Apply operation to all pairs of elements in x and y. Result array has shape x.shape + y.shape
+            
+        Custom ufuncs
+        
+            numpy.frompyfunc accepts a Python function along with a specification for the number of inputs and outputs.
+            
+            less featureful function numpy.vectorize - more intelligent about type inference
+            
+    Structured and Record Arrays
+    
+        A structured array is an ndarray in which each element can be thought of as representing a struct in C.
+        to specify a structured dtype, pass a list of tuples - (field_name, field_data_type), then pass that as the dtype when constructing an array.
+        
+                data = np.array([(1,2),(3,4)], dtype=[('x', np.float64), ('y', np.int32)])
+        
+        Nested dtypes and Multidimensional Fields
+    
+            you can specify the shape of a structured dtype as well.
+        
+            This enables you to express more complicated, nested structures as a single block of memory in an array. similar to hierarchical indexing in pandas.
+        
+        Why Use Structured Arrays?
+    
+            structured arrays provide a very fast and efficient way of writing data to and from disk.
+            writing data files as fixed length record byte streams is a common way to serialize data in C and C++ code. As long as the format of the file is known, the data can be read into memory using np.fromfile
+        
+    More About Sorting
+    
+        sort instance method makes in place views.
+        np.sort() makes copy.
+        
+        data[::-1] returns a list (view) in reverse order for descending sort.
+        
+        Indirect Sorts: argsort and lexsort
+        
+            use argsort and np.lexsort to get indices based on the data for sorting.
+            
+        Alternate Sort Algorithms
+    
+            A stable sorting algorithm preserves the relative position of equal elements. important in indirect sorts where the relative ordering is meaningful.
+            you can use quicksort, mergesort, and heapsort as the kind
+        
+            use search sorted for binary search.
+                - can be used with pandas groupby to easily bin data and get group stats.
+         
+    NumPy Matrix Class
+    
+        You can cast to matrix from np arrays to make linear algebra easier, but you should cast back to np arrays after since they're more widely used.
+        
+    Advanced Array Input and Output
+    
+        A memory-mapped file is a method for treating potentially very large binary data on disk as an in-memory array.
+        NumPy implements a memmap object that is ndarray-like, enabling small segments of a large file to be read and written without reading the whole array into memory. works same as in memory ndarrays.
+        
+    Performance Tips
+    
+        Convert Python loops and conditional logic to array operations and boolean array operations
+        Use broadcasting whenever possible
+        Avoid copying data using array views (slicing)
+        Utilize ufuncs and ufunc methods
+        Use Cython when possible

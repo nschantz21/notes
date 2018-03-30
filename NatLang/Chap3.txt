@@ -1,0 +1,111 @@
+Chap 3: Processing Raw Text
+
+If working with a nltk.text.collections() there will be headers and possibly other info in addition to the raw text - so you'll need to manually check it out.
+
+NLTK provides a helper function nltk.clean_html(), which takes an HTML string and returns raw text.
+
+You can process RSS feeds using the third party feedparser module, then use NLTK
+
+Extracting encoded text from files:
+    You can process Unicode text a couple different ways. The codecs module lets you open files and specify the encoding of the text for processing.
+    e.g. codecs.open(path, encoding='latin2')
+    
+    The string .encode method returns an 8-bit string version of the Unicode string, encoded in the requested encoding.
+    
+Regular Expressions for Detecting Word Patterns:
+    
+    by prefixing the string with the letter r, to indicate that it is a raw string- it contains newlines and returns etc.
+    get into the habit of using r'...' for regular expressions
+    
+    It's complex and arcane - you need to look at the reference when you do it.
+    
+Searching Tokenized Text:
+    
+    nltk objects have special .findall method for substring search using regex.
+    
+    nltk.re_show(p, s) which annotates the string s to show every place where pattern p was matched, and nltk.app.nemo() which provides a graphical interface for exploring regular expressions
+    
+    you can use patterns in text to discover Hyper/Hyponyms - but be aware of false positives and negatives.  e.g. "Pine is a Tree."
+    
+Normalizing Text:
+
+    To stem - remove affixes from the word token
+    Lemmatize - to make sure that the resulting stemmed form is a known word in a dictionary
+    
+    NLTK includes some stemmers, but it is not well defined and differs between stemmers.
+    
+    WordNet lemmatizer only removes affixes if the resulting word is in its dictionary.
+    
+    May want to map non-standard words (abbreviations) to a special vocabulary.  This keeps the vocabulary small and improves the accuracy of many language modeling tasks.
+    
+Regular Expressions for Tokenizing Text:
+
+    use this to tokenize words from raw text using regex.
+    re.findall(r"\w+(?:[-']\w+)*|'|[-.(]+|\S\w*", raw)
+    
+    nltk.regexp_tokenize() is more efficient for this task, and avoids the need for special treatment of parentheses
+    
+>>> pattern = r'''(?x)    # set flag to allow verbose regexps
+...     ([A-Z]\.)+        # abbreviations, e.g. U.S.A.
+...   | \w+(-\w+)*        # words with optional internal hyphens
+...   | \$?\d+(\.\d+)?%?  # currency and percentages, e.g. $12.40, 82%
+...   | \.\.\.            # ellipsis
+...   | [][.,;"'?():-_`]  # these are separate tokens
+... '''
+>>> nltk.regexp_tokenize(text, pattern)
+
+    We can evaluate a tokenizer by comparing the resulting tokens with a wordlist, and reporting any tokens that don't appear in the wordlist, using set(tokens).difference(wordlist).
+
+    Contractions also present an issue for tokenization.  It should be broken up into it's member words to allow for better analysis of meaning of a sentence.
+    
+Segmentation:
+
+    Segmentation based on punctuation in written text - problems arise in abbrviations using periods.
+    
+    Problem also arises in spoken language - segmenting continuous speech stream into words. Solution is to use boolean values to indicate word-break after a character - chunking - and create a function that segments it.
+    e.g. 'helloworld' -> 0000100001
+        
+    The problem is now to find the bit string (as above) that correctly segments the text.  
+    First make a segmenting funciton that segments a given text string based on a given bit string.  Then sum the text size and lexicon size to serve as a score of the quality of the segmentation.  smaller values indicate a better segmentation - it would mean larger words and less unique lexical items.
+    The final step is to search for the pattern of zeros and ones that minimizes this objective function.
+    
+    Non-Deterministic Search Using Simulated Annealing: begin searching with phrase segmentations only; randomly perturb the zeros and ones proportional to the "temperature"; with each iteration the temperature is lowered and the perturbation of boundaries is reduced
+    Simulated annealing is a heuristic for finding a good approximation to the optimum value of a function in a large, discrete search space, based on an analogy with annealing in metallurgy. The technique is described in many Artificial Intelligence texts.
+    
+    
+    # set of functions to perform simulated annealing
+    
+    def evaluate(text, segs):
+        words = segment(text, segs)
+        text_size = len(words)
+        lexicon_size = len(' '.join(list(set(words))))
+        return text_size + lexicon_size
+        
+    from random import randint
+    
+    def flip(segs, pos):
+        # flips single bit - random access
+        return segs[:pos] + str(1-int(segs[pos])) + segs[pos+1:]
+
+    def flip_n(segs, n):
+        # flips range of bits
+        for i in range(n):
+            segs = flip(segs, randint(0,len(segs)-1))
+        return segs
+
+    def anneal(text, segs, iterations, cooling_rate):
+        temperature = float(len(segs))
+        while temperature > 0.5:
+            best_segs, best = segs, evaluate(text, segs)
+            for i in range(iterations):
+                guess = flip_n(segs, int(round(temperature)))
+                score = evaluate(text, guess)
+                if score < best:
+                    best, best_segs = score, guess
+            score, segs = best, best_segs
+            temperature = temperature / cooling_rate
+            print evaluate(text, segs), segment(text, segs)
+        print
+        return segs
+    
+    

@@ -1,0 +1,125 @@
+Chapter 5: Categorizing and Tagging Words
+
+Fundamental techniques in NLP: including sequence labeling, n-gram models, backoff, and evaluation
+
+tagging gives us a simple context in which to present them.
+Tagging is usually the second step after tokenization.
+
+The process of classifying words into their parts of speech and labeling them accordingly is known as part-of-speech tagging, POS-tagging, or simply tagging. Parts of speech are also known as word classes or lexical categories. The collection of tags used for a particular task is known as a tagset.
+
+use nltk.pos_tag(text) to get part of speech tagging.
+
+using the .similar(word) finds words that appear in a similar context.
+This is apparently a very memory and computationally expensive process.
+
+A tagger can also model our knowledge of unknown words.
+
+Tagged Corpora:
+    
+    Whenever a corpus contains tagged text, the NLTK corpus interface will have a tagged_words() method
+    To avoid complications of different tagsets, use the tagset='universal' argument when calling the tagged_words method on corpus objects.
+    
+    Corpora may also have tagged_sents() method. useful for developing automatic taggers.
+    
+    To see relation of POS in text: create bigrams of tuples of words and POS, then create frequency distribution of the POS relationships -> what comes before a noun most often?
+    
+    
+    Exploring Tagged Corpora:
+    
+        if studying how a word is used in text, look at the POS frequency dist for words that preceed or follow the word in question.
+        
+        For words that are highly ambiguous as to their part of speech tag, Understanding why such words are tagged as they are in each context can help us clarify the distinctions between the tags. You can do this by taking larger contextual groups (like three or four words) 
+        
+        Use the POS concordance tool nltk.app.concordance() to see how the tag of the word correlates with the context of the word. - creates permuted index
+        
+Automatic Tagging:
+    
+    The tag of a word depends on the word and its context within a sentence. For this reason, we will be working with data at the level of (tagged) sentences rather than words.
+    
+    The Default Tagger:
+    
+        set a default tagger based on the tag with the highest frequency in the tagset of a similar corpus. This will improve efficiency of later tagging in the untagged corpus.
+        nltk.DefaultTagger('NN')
+    
+    The Regular Expression Tagger:
+    
+        nltk.RegexpTagger() assigns tags to tokens on the basis of matching patterns.
+        Just pass it a list of tuples of regexes and tags:
+                (r'*ing$', VGB) # gerunds
+    
+    The Lookup Tagger (NLTK UnigramTagger):
+        
+        Make a lookup table of word to probable tag based on cumulative frequency distribution.
+        Now when tagging the new text, we want to use the lookup table first (likely_tags), and if it is unable to assign a tag, then use the default tagger, a process known as backoff. We do this by specifying one tagger as a parameter to the other.
+        
+        nltk.UnigramTagger(model=likely_tags, backoff=nltk.DefaultTagger('NN'))
+        
+        Lookup Tagger Performance as a function of increasing model size is logorithmic.
+        
+    Evaluation:
+    
+        We evaluate the performance of a tagger relative to the tags in the gold standard test data. This is a corpus which has been manually annotated and which is accepted as a standard against which the guesses of an automatic system are assessed. The tagger is regarded as being correct if the tag it guesses for a given word is the same as the gold standard tag.
+        
+    
+N-Gram Tagging:
+
+     For each token, assign the tag that is most likely for that particular token based on frequencies in training data.
+     We train a UnigramTagger by specifying tagged sentence data as a parameter when we initialize the tagger.
+     
+    Separating the Training and Testing Data:
+    
+        When training a tagger, split the text 90/10 training/test. This gives a better idea of tagger performance on previously unseen text.
+        
+    General N-Gram Tagging:
+        
+        An n-gram tagger is a generalization of a unigram tagger whose context is the current word together with the part-of-speech tags of the n-1 preceding tokens.
+        As n gets larger, the specificity of the contexts increases, as does the chance that the data we wish to tag contains contexts that were not present in the training data. This is known as the sparse data problem, and is quite pervasive in NLP. As a consequence, there is a trade-off between the accuracy and the coverage of our results (and this is related to the precision/recall trade-off in information retrieval).
+        
+    Combining Taggers:
+        
+        you can nest backup taggers, thus setting a precedence of taggers.
+        You can also set minimum number of observations needed to set a tag in context.
+        So you can set each backup tagger to be N-1, and end with a default tagger. This could somewhat mitigate the sparse data problem.
+        
+    Tagging Unknown Words(out-of-vocabulary items):
+    
+        A useful method to tag unknown words based on context is to limit the vocabulary of a tagger to the most frequent n words, and to replace every other word with a special word UNK (using a defaultdict when mapping).  A unigram tagger will probably learn that UNK is usually a noun. However, the n-gram taggers will detect contexts in which it has some other tag.
+        
+    Storing Taggers:
+        
+        Save taggers as pickle files.
+        
+            To save:
+                	
+                >>> from cPickle import dump
+                >>> output = open('t2.pkl', 'wb')
+                >>> dump(t2, output, -1)
+                >>> output.close()
+                
+            to open:
+            
+                >>> from cPickle import load
+                >>> input = open('t2.pkl', 'rb')
+                >>> tagger = load(input)
+                >>> input.close()
+                
+    Performance Limitations (accuracy):
+    
+        look at part-of-speech ambiguity encounters.  the more ambiguity, the less useful it is.
+        you can also study the mistakes of the tagger - use the nltk.ConfusionMatrix(gold_tags, test_tags) - It charts expected tags (the gold standard) against actual tags generated by a tagger.
+    
+Transformation-Based Tagging:
+
+    A potential issue with n-gram taggers is the size of their n-gram table (or language model).
+    It is simply impractical for n-gram models to be conditioned on the identities of words in the context.
+    
+    Brill Tagging (transformation-based learning):
+    
+        guess the tag of each word, then go back and fix the mistakes.
+        ->  transforms a bad tagging of a text into a better one.
+        Supervised learning like n-gram tagging, except, it does not count observations but compiles a list of transformational correction rules.
+        Each rule is then scored according to its net benefit: the number of incorrect tags that it corrects, less the number of correct tags it incorrectly modifies.
+
+How to Determine the Category of a Word:
+
+    there is no one 'right way' to assign tags, only more or less useful ways depending on one's goals.

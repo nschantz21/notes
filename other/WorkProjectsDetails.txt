@@ -1,0 +1,42 @@
+Work Projects
+
+I seek out workflow inefficiencies and new opportunities for insight into the operational environment. I am resposible for the interpretation and implementation of Client Guideline and some Regulatory Compliance in our Account management and trading department.
+
+
+FX Transparency:
+    Started as data integrity analysis for FX trades at the international asset holding Mutual Fund Custodians, but it required me to essentially recreate the report on my own in order to verify integrity of the data & analysis.  In doing so I was able to extend the analysis with greater detail since I also had access to internal data that provided insight to the trades - e.g. swaps and forwards.
+    I was then able to take the program I had written and apply it to international trades in all accounts across all custodians and brokers.  Many of the FX functions were also useful in analyzing individual Fixed Income and Equity trades.
+
+Internal Compliance Violations:
+    Wrote SQL query to find accounts that had Client stipulated Social Restriction Violations / Trading Restrictions (Funds, Industry, Issuer).
+
+Client Guideline Monthly Review:
+    Wrote SQL query to aggregate Client holdings information for faster auditing inreview of Client restrictions.  I then standardized/translated the client restrictions and implemented them in a compliance program (in Python), which identified more complex client restriction violations.
+
+Quarterly Social Restriction Audit:
+    Created program to streamline updating the social restriction trading attributes of securities and issuers. Originally, we were only to review and update our core holdings because the process for updating was so labor intensive. It was a twofold process for the Informix database and MS SQL database.
+    I wrote a program, that queried the Informix database, calls to a thirdparty API that provides ESG information, then produces a restriction code based on that information in Python and alters the SQL table accordingly. CR only takes xml files, so I created xml files based on the MS SQl and informix DB info to import into CR.
+
+Delayed Open Orders:
+    There was an existing program that kept track of trades that were filtered out because of Capital Gains excpetions (preventing short term gains). The existing program had incorrect information and left over holdings for inactive accounts and no longer held securities.
+    I wrote a new SQL query that retrieved the currently eligble trades/accounts and incorporated directive and pricing information to provide the account managers a more detailed view of the accounts.
+    Then (in python) I wrote a program to provide the best day to purchase the assets in bulk and technical analysis on the asset - 30 day MA so we know if it's going to hit the limit again or become too expensive.
+
+Daily Trade Summary:
+    Created program to show the Day's trades, accompanying technical details(volume, price, broker, price range, limit).  
+
+Daily Order Tracker:
+    Tracked the internal movement of trades between systems based on trading directives - order creation, sent to trading, order placement, order fill, allocation.
+    
+Fundamental Analysis:
+    Interpreted and transformed investment/economic models into modular programs for faster/easier interpretation of financial statements / fundamental analysis.
+
+
+
+    
+Python has the Global Interpreter Lock (GIL). “a mutex that prevents multiple native threads from executing Python bytecodes at once.”  The GIL ensures that only one native (or OS-level) thread executes Python bytecodes at any given time during the execution of a CPython program. The GIL affects not just Python-level code, but the Python/C API as a whole.
+The GIL is necessary mainly because CPython’s memory management is not thread-safe, and some feautures have grown to depend on it.
+    
+The GIL is necessary to help with the memory management of Python objects. 
+C code that does not work with Python objects can be run without the GIL in effect, allowing fully threaded execution.
+The GIL is specific to CPython. Other Python implementations, like Jython, Iron‐Python, and PyPy, have no need for a GIL.

@@ -1,0 +1,119 @@
+First you generate models to capture a pattern in data and make it explicit.
+
+In generating models, We need a way to quantify the distance between the data and a model.
+
+Then we can fit the model by finding the values that generate the model with the smallest distance from this data
+
+One easy place to start is to find the vertical distance between each point and the model.
+This distance is just the difference between the y value given by the model (the prediction), and the actual y value in the data (the response).
+
+To compute an overall distance between the predicted and actual values, use the “root-mean-squared deviation”. We compute the difference between actual and predicted, square them, average them, and the take the square root.
+
+Then keep the models with the smallest distance - because thay are the closest to the data/the best.
+
+To find the best fitting model, use a numerical minimisation tool called Newton-Raphson search. You pick a starting point and look around for the steepest slope. You then ski down that slope a little way, and then repeat again and again, until you can’t go any lower. use optim() to do this
+
+It creates a function that defines the distance between the model and the dataset, then minimises the distance by modifying the parameters of the model.
+
+lm() is better and does the same thing.  finds the closest model in a single step, is faster, and guarentees there is a global minimum. Uses different syntax for the formula argument -> Formulas look like y ~ x, which lm() will translate to a function like y = a_1 + a_2 * x
+
+
+One way to make linear models more robust is to use a different distance measure. For example, instead of root-mean-squared distance, you could use mean-absolute distance.
+One challenge with performing numerical optimisation is that it’s only guaranteed to find one local optima.
+
+
+23.3 Visualising models
+
+  Residuals - what is left after subtracting the predictions from the data
+  Residuals are powerful because they allow us to use models to remove striking patterns so we can study the subtler trends that remain.
+  
+  
+  23.3.1 Predictions
+  
+    To visualize Predictions:
+      Generate an evenly spaced grid of values that covers the region where our data lies with           modelr::data_grid()
+      Then add predictions - makes a new column in the passed df.  
+        modelr::add_predictions()
+      Then plot the predictions.  This will work with any model in R.
+      
+      grid <- sim1 %>% 
+        data_grid(x) 
+      grid <- grid %>% 
+        add_predictions(sim1_mod)
+      
+      ggplot(sim1, aes(x)) +
+        geom_point(aes(y = y)) +
+        geom_line(aes(y = pred), data = grid, colour = "red", size = 1)
+        
+  23.3.2 Residuals
+  
+    The residuals are just the distances between the observed and predicted values.
+    add residuals to the data with add_residuals()
+    
+    to compute residuals we need actual y values, so you don't use a data grid.
+    
+    You can use a frequency polygon to help understand the spread of the residuals - this helps you calibrate the quality of the model.
+    
+    You can also recreate plots using residuals instead of the original predictor - if it looks like random noise, then you'll know the model did a good job of capturing patterns in the dataset.
+    
+23.4 Formulas and model families
+
+  to see the details of a formula, use model_matrix(data, y ~ x)
+  It takes a data frame and a formula and returns a tibble that defines the model equation: each column in the output is associated with one coefficient in the model
+  
+  23.4.1 Categorical variables
+  
+    You can use a categorical variable as a dependent. lm() will convert it to a binary value.
+    
+    Effectively, a model with a categorical x will predict the mean value for each category. Note that this will not be perfectly binary.  
+    
+  23.4.2 Interactions (continuous and categorical)
+  
+    you can combine predictors, even if one is continuous and the other is categorical.
+    
+    When you add variables with +, the model will estimate each effect independent of all the others.   It’s possible to fit the so-called interaction by using * in the formula as well.
+    Note that whenever you use *, both the interaction and the individual components are included in the model.
+    y ~ x1 * x2 is translated to y = a_0 + a_1 * x1 + a_2 * x2 + a_12 * x1 * x2
+    
+    To visualise these models we need two new tricks:
+
+      We have two predictors, so we need to give data_grid() both variables. It finds all the unique values of x1 and x2 and then generates all combinations. - all the possible space it could occupy.
+
+      To generate predictions from both models simultaneously, we can use gather_predictions() which adds each prediction as a row. The complement of gather_predictions() is spread_predictions() which adds each prediction to a new column.
+      
+    gather_residuals() works similarly.  Then you can see between the two methods which was better at capturing the pattern.
+    
+    
+  23.4.3 Interactions (two continuous)
+    
+    when making the data_grid, use seq_range() to discretize the continuous range between the min and max values.
+    
+    When visualizing the model, because it's two continuous variables, you can think of it as a 3d surface - geom_tile() - but it's better to look at it "from the side" since distinguishing between shades of colors can be difficult.
+    Interaction between two continuous variables works basically the same way as for a categorical and continuous variable. An interaction between lines says that there’s not a fixed offset: you need to consider both values of x1 and x2 simultaneously in order to predict y. y ~ x1 * x2
+    
+  23.4.4 Transformations
+    
+    You can also perform transformations inside the model formula. For example, log(y) ~ sqrt(x1) + x2 is transformed to log(y) = a_1 + a_2 * sqrt(x1) + a_3 * x2. If your transformation involves +, *, ^, or -, you’ll need to wrap it in I() so R doesn’t treat it like part of the model specification.
+    Transformations are useful because you can use them to approximate non-linear functions.
+    
+    use poly() for Taylor's Theorem
+    y ~ poly(x, 2)
+    but polynomials rapidliy shoot off to positive/neg infinity
+    
+    
+  A linear spline is a continuous function formed by connecting linear segments. The points where the segments connect are called the knots of the spline.
+
+    So use the natural spline, splines::ns() instead.
+    y ~ ns(x, 2)
+    
+    The downside to approximating a function outside the range of the data is that you can never tell if the behaviour is true - you must rely on science and theory at that point.
+    
+23.5 Missing values
+
+  modelling functions will silently drop any rows that contain missing values, use options(na.action = na.warn) to get a warning.  To suppress the warning, set na.action = na.exclude
+  
+  You can always see exactly how many observations were used with nobs()
+  
+23.6 Other model families
+
+  Use different models for different types of data

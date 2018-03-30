@@ -1,0 +1,55 @@
+ NumPy Basics: Arrays and Vectorized Computation
+
+An ndarray is a generic multidimensional container for homogeneous data; that is, all of the elements must be the same type. Every array has a shape, a tuple indicating the size of each dimension, and a dtype, an object describing the data type of the array
+
+    data = [0.0, 1.1, 2.2]
+    arr = np.array(data)
+    arr.shape
+    arr.dtype
+
+use np.empty() to make an empty array or matrix - will probably be filled with garbage
+An important first distinction from lists is that array slices are views on the original array. This means that the data is not copied, and any modifications to the view will be reflected in the source array. - it's all references
+
+You can create a boolean array based on a relational operator, and then index based on that boolean value. Selecting data from an array by boolean indexing always creates a copy of the data, even if the returned array is unchanged:
+    
+    data[arr == 0.0]
+
+You can also assign values based on a that boolean:
+    
+    data[data < 0] = 0
+
+Fancy Indexing:
+    To select out a subset of the rows in a particular order, you can simply pass a list or ndarray of integers specifying the desired order.
+    Using negative indices select rows from the end.
+    Passing multiple index arrays does something slightly different; it selects a 1D array of elements corresponding to each tuple of indices.
+    Keep in mind that fancy indexing, unlike slicing, always copies the data into a new array.
+
+Transposing:
+    you can transpose arrays using the .T method of the numpy object. Useful for getting the inner matrix product:
+            arr = np.arange(15).reshape((3, 5))
+            np.dot(arr.T, arr)
+    You can also specify the transposition shape through the .transform or .swapaxes method
+    These all return views without copying.
+
+A universal function, or ufunc, is a function that performs elementwise operations on data in ndarrays. You can think of them as fast vectorized wrappers for simple functions that take one or more scalar values and produce one or more scalar resultshere - like np.sqrt(data) or exp.
+
+Numpy arrays allow veoctorization to replace loops - it's a lot faster.
+
+The numpy.where function is a vectorized version of the ternary expression x if condition else y. 
+        result = np.where(cond, xarr, yarr)
+Multi- conditional For loops can be converted into nested where method
+    np.where(cond1 & cond2, 0,
+        np.where(cond1, 1, 
+            np.where(cond2, 2, 3)))
+
+np.save and np.load are the two workhorse functions for efficiently saving and loading array data on disk. Arrays are saved by default in an uncompressed raw binary format with file extension .npy
+You save multiple arrays in a zip archive using np.savez and passing the arrays as keyword arguments.  When loading an .npz file, you get back a dict-like object which loads the individual arrays lazily
+
+There are a bunch of linear algebra functions in the numpy.linalg namespace.
+
+Random Number Generation:
+    np.random.normal() # for normally distributed array/matrix
+    np.random.randint(lower_limit, upper_limit, size=number_of_steps) # for single random walk of equal probability
+To simulate many random walks, simply pass the randint() function a two dimentional size.
+
+    np.random.normal(loc=0, scale=0.25, size=(nwalks, nsteps)) # to generate normally distributed steps with some mean and standard deviation

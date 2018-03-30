@@ -1,0 +1,29 @@
+Chapter 18: Pipes
+
+use pryr::object_size() here, not the built-in object.size(). object.size() only takes a single object so it can’t compute how data is shared across multiple objects.
+
+The pipe works by performing a “lexical transformation”: behind the scenes, magrittr reassembles the code in the pipe to a form that works by overwriting an intermediate object.
+
+Functions that use the current environment and functions that use lazy assignment don't work with the pipe.
+
+The use of assign with the pipe does not work because it assigns it to a temporary environment used by %>%. If you do want to use assign with the pipe, you must be explicit about the environment: 
+        env <- environment()
+        "x" %>% assign(100, envir = env)
+    Other functions with this problem include get() and load()
+    
+Lazy Functions - Function arguments are only computed when the function uses them, not prior to calling the function. 
+
+When not to use the pipe:
+
+    Pipes are most useful for rewriting a fairly short linear sequence of operations.
+    Don't use Pipes when:
+        Pipes become too long.
+        You have mulitple inputs/outputs or objects being combined.
+        You are starting to think about a directed graph with a complex dependency structure. Pipes are fundamentally linear.
+        
+Other tools from magrittr:
+
+    If you want to call a function for its side effects, you can use the "tee" pipe.  %T>% it works like the regular pipe, but returns the left-hand side.  
+    
+    If you’re working with functions that don’t have a data frame based API, use %$%.  It “explodes” out the variables in a data frame so that you can refer to them explicitly.
+    

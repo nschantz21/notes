@@ -1,0 +1,63 @@
+Calls
+    
+    A call is very similar to a list. It has length, [[ and [ methods, and is recursive because calls can contain other calls. The first element of the call is the function that gets called.
+    x <- quote(some_function(arg1, arg2, arg3))
+    
+    The point is you get to manipulate the function without evaluation.  Useful for passing a function around.
+    
+    pryr::standardise_call() - converts all postional arguments to named arguments in a call.
+    
+    call() or as.call() creates a new call from its components
+        call("function_name", arg1, param2 = arg2)
+    
+Capturing the current call
+
+    If you want to know the exact expression that caused the current function to be run.
+    
+    sys.call() captures exactly what the user typed.
+
+    match.call() makes a call that only uses named arguments. It’s like automatically calling pryr::standardise_call() on the result of sys.call()
+    
+    Modelling functions often use match.call() to capture the call used to create the model. This makes it possible to update() a model, re-fitting the model after modifying some of original arguments.
+    
+    If you want to re-run code captured with match.call(), you also need to capture the environment in which it was evaluated, usually the parent.frame(). The downside to this is that capturing the environment also means capturing any large objects which happen to be in that environment, which prevents their memory from being released.
+    
+Pairlists
+
+    useful if you want to construct a function from its components, reading source code of a function, or passing a function to another function without explicitly creating that first function.
+    
+    delaying evaluation with alist can let you supply arguments that varies over the range of the function.
+
+    pairlists behave identically to lists, but have a different internal representation (as a linked list rather than a vector). Pairlists have been replaced by lists everywhere except in function arguments.
+    
+    pryr::alist() - the argument list function. Doesn’t evaluate its arguments so that alist(x = a) is shorthand for list(x = quote(a))
+        
+        add <- make_function(alist(a = 1, b = 2), quote(a + b))
+    
+        
+Parsing and deparsing
+
+    parse() - convert a string to an expression.  takes a character object and returns an expression object.  mainly used for parsing files of code to disk.  Returns expression object, essentially just a list of expressions
+    
+    The primary use of parse() is parsing files of code to disk
+    
+    
+Walking the AST with recursive functions
+
+    pryr::ast() - abstract syntax tree (AST)
+    
+    It’s easy to modify a single call with substitute() or pryr::modify_call(). For more complicated tasks we need to work directly with the AST. 
+    
+    expressions have a tree structure- use a recursive function. Find the base case, then figure out how to combine the results from the recursive case
+    For calls, there are two base cases (atomic vectors and names) and two recursive cases (calls and pairlists)
+    
+    To deal with repeated names and neglecting assignments inside other assignments use unique() around the recursive case to remove duplicate assignments.
+    
+    
+    Modifying the call tree
+    
+        bquote() - slightly more flexible version of quote() - allows you to optionally quote and unquote parts of an expression.  Everything is quoted, unless it’s encapsulated in .() in which case it’s evaluated and the result is inserted.  This allows you to control what gets evaluated and when.
+        
+        Functions that modify the source tree are most useful for creating expressions that are used at run-time, rather than those that are saved back to the original source file. This is because all non-code information is lost
+        
+    

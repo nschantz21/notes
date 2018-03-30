@@ -1,0 +1,107 @@
+Chapter 20: Vectors
+
+Underlying data structure of tibble.
+
+20.2 Vector basics
+
+    Two types of vectors:
+        Atomic and Lists
+    The chief difference between atomic vectors and lists is that atomic vectors are homogeneous, while lists can be heterogeneous.
+    
+    use typeof() and length() built-in functions.
+    
+    Vectors can also contain arbitrary additional metadata in the form of attributes. These are called augmented vectors.
+    
+20.3 Important types of atomic vector
+
+    types: logical, integer, double, and character
+    
+    20.3.1 Logical:
+        only three possible values: FALSE, TRUE, and NA.
+        usually constructed with comparison operators or c().
+        
+    20.3.2 Numeric
+        Integer and double vectors.
+        Use is.finite(), is.infinite(), and is.nan() for checking Doubles.
+        
+    20.3.3 Character
+        R uses a global string pool. This means that each unique string is only stored in memory once, and every use of the string points to that representation - using 8 byte pointers.
+        
+    20.3.4 Missing values
+        You can always use NA and it will be converted to the correct type using the implicit coercion rules.
+        
+20.4 Using atomic vectors
+    
+    20.4.1 Coercion
+        Explicit coercion happens when you call a function like as.logical(), as.integer(), as.double(), or as.character()
+        Usually better to use col_types for conversion.
+        
+        Implicit coercion happens when you use a vector in a specific context that expects a certain type of vector.
+        
+        Favor explicit conversions where implicit conversion may cause confusion
+        
+        When you try and create a vector containing multiple types with c() the most complex type always wins.
+    
+    20.4.2 Test functions
+        To check vector type, use is_* functions provided by purrr.
+        Each predicate also comes with a “scalar” version, like is_scalar_atomic()
+        
+    20.4.3 Scalars and recycling rules
+        Recycling - R will implicitly coerce the length of vectors; the shorter vector is repeated, or recycled, to the same length as the longer vector.
+        R doesn’t actually have scalars: instead, a single number is a vector of length 1.
+        
+        
+        Vector recycling can silently conceal problems, so the vectorised functions in tidyverse will throw errors when you recycle anything other than a scalar. If you do want to recycle, you’ll need to do it yourself with rep().
+        
+        
+    20.4.4 Naming vectors
+        All types of vectors can be named. You can name them during creation with c().  Or after the fact with purrr::set_names().  Named vectors are most useful for subsetting. - works like key-value pairs.
+    
+    20.4.5 Subsetting
+        "[" is the subsetting function, and is called like x[a].
+        You can select by a vectorized boolean returning function, index position (positive integer), exclude by index position (negative integer), key for key value pairs.
+        "[[" only ever extracts a single element, and always drops names. It’s a good idea to use it whenever you want to make it clear that you’re extracting a single item, as in a for loop.
+        
+20.5 Recursive vectors (lists)
+    
+    Lists can be nested. Suitable for representing heirarchal or tree-like structures. str(your_list) will show you the structure of the list.
+    
+    20.5.2 Subsetting
+        "[" extracts a sub-list. returns a list.
+        Like with vectors, you can subset with a logical, integer, or character vector.
+        "[[" extracts a single component and removes a layer of hierarchy.
+       
+        $ is a shorthand for extracting named elements of a list.
+        my_list$element == my_list[["element"]]
+        
+        
+20.6 Attributes
+    
+    Any vector can contain arbitrary additional metadata through its attributes.
+    You can get and set individual attribute values with attr() or see them all at once with attributes().
+        attr(x, "greeting") <- "Hi!" or a function
+    
+     three very important attributes that are used to implement fundamental parts of R:
+
+        Names are used to name the elements of a vector.
+        Dimensions (dims, for short) make a vector behave like a matrix or array
+        Class is used to implement the S3 object oriented system.
+    
+    Generic Functions are like templates - use dynamic binding. use the built-in methods() function to see class methods of a generic function.
+    You can see the specific implementation of a method with getS3method().
+    
+20.7 Augmented vectors
+
+    augmented vectors have a class, they behave differently to the atomic vector on which they are built. Factors, Dates, Date-times, Tibbles.
+    
+    20.7.1 Factors
+        Factors are designed to represent categorical data that can take a fixed set of possible values. built on top of integers, and have a levels attribute
+    
+    20.7.2 Dates and date-times
+        Dates represent the number of days since 1 January 1970.
+        Date-time represent number of seconds since 1 January 1970.
+        
+    20.7.3 Tibbles
+        Tibbles are augmented lists: they have class “tbl_df” + “tbl” + “data.frame”, and names (column) and row.names attributes
+        All the elements of a data frame must be vectors with the same length.
+        Tibbles are a child class of data.frame

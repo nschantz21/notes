@@ -1,0 +1,39 @@
+Performance
+
+Microbenchmarking
+
+    microbenchmark::microbenchmark - provides precise timing to compare operations that only take a tiny amount of time. Focus on the median, and use the upper and lower quartiles (lq and uq) to get a feel for the variability.
+    You could use sys.time instead, but it's much less precise.
+    
+Language performance
+
+    three trade-offs that limit the performance of the R-language: extreme dynamism, name lookup with mutable environments, and lazy evaluation of function arguments.
+    trade-offs that are key to language design: the designer must balance speed, flexibility, and ease of implementation.
+    
+    Extreme dynamism
+    
+        Pretty much the only things you can’t change are objects in sealed namespaces, which are created when you load a package.
+        Advantage of dynamism - minimal upfront planning necessary.
+        Disadvantage of dynamism - difficult to predict exactly what will happen with a given function call. Easier prediction -> easier optimization
+        S3 and S4 method dispatch are expensive because R must search for the right method every time the generic is called.
+        
+    Name lookup with mutable environments
+        
+        It's difficult to find the value associated with a name in the R-language.  This is because of Lexical Scoping and Extreme Dynamism.
+        You can’t do name lookup just once: you have to start from scratch each time. This problem is exacerbated by the fact that almost every operation is a lexically scoped function call. 
+        
+    Lazy evaluation overhead
+    
+        To implement lazy evaluation, R uses a promise object that contains the expression needed to compute the result and the environment in which to perform the computation. Creating these objects has some overhead, so each additional argument to a function decreases its speed a little.
+
+
+Implementation performance
+
+    the overriding concern for R-core is not to make R fast, but to build a stable platform for data analysis and statistics.
+     
+    Use microbench() to find the slowest parts and try to replace them with better R functions. If that isn't fast enough, replace with C++
+
+
+Alternative R implementations
+
+    No reason to use anything other that GNU-R

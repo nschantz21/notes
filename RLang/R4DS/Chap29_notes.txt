@@ -1,0 +1,78 @@
+Chapter 29 R Markdown formats
+
+two ways to set the output of a document:
+    Permanently, by modifying the YAML header
+    Transiently, by calling rmarkdown::render() by hand
+    
+29.2 Output options
+
+    To override the default parameter values, you need to use an expanded output field in the YAML header:
+    
+    output:
+        doc_type:
+            option: value
+            
+29.3 Documents
+
+    Lots of different doc output types.
+    Turn off code echo for decision makers who don't want to see code.  knitr::opts_chunk$set(echo = FALSE)
+    or in YAML option
+        code_folding: hide
+        
+29.4 Notebooks
+
+    A html_document is focussed on communicating with decision makers, while a html_notebook is focussed on collaborating with other data scientists.
+    
+    use both html_notebook and github_document outputs when collaborating:
+        output:
+          html_notebook: default
+          github_document: default
+          
+    html_notebook gives you a local preview, and a file that you can share via email. github_document creates a minimal md file that you can check into git. You can easily see how the results of your analysis (not just the code) change over time, and GitHub will render it for you nicely online.
+    
+29.5 Presentations
+
+    Presentations work by dividing your content into slides, with a new slide beginning at each first (#) or second (##) level header. You can also insert a horizontal rule (***) to create a new slide without a header.
+    
+    For HTML presentation
+    revealjs::revealjs_presentation
+    
+29.6 Dashboards
+        
+    Flexdashboard makes it particularly easy to create dashboards using R Markdown.
+    
+    Each level 1 header (#) begins a new page in the dashboard.
+    Each level 2 header (##) begins a new column.
+    Each level 3 header (###) begins a new row.
+    
+    
+29.7 Interactivity
+
+    29.7.1 htmlwidgets
+    
+        htmlwidgets - R functions that produce interactive HTML visualisations
+        dygraphs - for interactive time series visualisations.
+        DT - for interactive tables.
+        threejs - for interactive 3d plots.
+        DiagrammeR - for diagrams (like flow charts and simple node-link diagrams).
+        
+    29.7.2 Shiny
+    
+        shiny allows to create interatively using R not JavaScript.
+        
+        To call Shiny code from an R Markdown document, add runtime: shiny to the header
+        
+        Shiny apps need a Shiny server to be run online.  When you run shiny apps on your own computer, shiny automatically sets up a shiny server for you, but you need a public facing shiny server if you want to publish this sort of interactivity online.
+        
+29.8 Websites
+
+    To generate a complete website:
+        Put your .Rmd files in a single directory. index.Rmd will become the home page
+        Add a YAML file named _site.yml provides the navigation for the site.
+        Execute rmarkdown::render_site() to build _site, a directory of files ready to deploy as a standalone static website, or if you use an RStudio Project for your website directory.
+        
+29.9 Other formats
+
+    bookdown for writing books
+    prettydoc - lightweight document formats
+    rticles - formats for specific scientific journals

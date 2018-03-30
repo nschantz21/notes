@@ -1,0 +1,146 @@
+Chapter 10   Analyzing the Meaning of Sentences
+
+
+How can we represent natural language meaning so that a computer can process these representations?
+How can we associate meaning representations with an unlimited set of sentences?
+How can we use programs that connect the meaning representations of sentences to stores of knowledge?
+
+10.1   Natural Language Understanding
+     
+    Querying a Database
+        
+        Using natural language to query is easy with a restricted domain, but more complicated to generalize.  Feature-based grammar formalism (Chap 9) makes it easy to translate from English to SQL.
+        However, English to SQL through formalized grammar requires a lot of hard-coding, can be very rigid, and would need to be reimplemented for other data structures (XML). We should instead translate to logical formailisms.  This is more abstract and able to generalize.
+        
+    Natural Language, Semantics and Logic
+    
+        Instead of translating a sentence S from one language to another, we try to say what S is about by relating it to a situation in the world. 
+        
+        Declarative sentences are true or false in certain situations.
+        Definite noun phrases and proper nouns refer to things in the world.
+        
+        Once we have adopted the notion of truth in a situation, we have a powerful tool for reasoning. We can look at sets of sentences, and ask whether they could be true together in some situation.
+        A set of sentences are consistent if their truth values are not mutually exclusive - the statements should not negate eachother.
+        
+        Logic-based approaches to natural language semantics focus on those aspects of natural language which guide our judgments of consistency and inconsistency. The syntax of a logical language is designed to make these features formally explicit.  Determining properties like consistency can often be reduced to symbolic manipulation - to a task that can be carried out by a computer. 
+        A model for a set W of sentences is a formal representation of a situation in which all the sentences in W are true.
+        The domain D of discourse (all the entities we currently care about) is a set of individuals, while Relations are treated as sets built up from D.
+        
+10.2   Propositional Logic
+        
+    Propositional logic allows us to represent just those parts of linguistic structure which correspond to certain sentential connectives as boolean operators.
+    The basic expressions of propositional logic are propositional symbols.
+    
+    From the propositional symbols and the boolean operators we can build an infinite set of well formed formulas of propositional logic.  Every propositional letter is a formula, and logical statements involving boolean operators and propositional letters are also formulas.
+    
+    NLTKs LogicParser() parses logical expressions into various subclasses of Expression (nltk logic object).
+   Logics give us an important tool for performing inference. It's just standard logic.  
+   An argument is valid if there is no possible situation in which its premises are all true and its conclusion is not true.
+   
+   In Propositional logic, the smallest elements we have to play with are atomic propositions, and we cannot "look inside" these to talk about relations between individuals.  we have to capture a particular case of asymmetry through symbolic representation of the binary nature of the conflicting symbols.
+        e.g. SnF -> -FnS
+        
+    Arguments can be tested for "syntactic validity" by using a proof system
+    Logical proofs can be carried out with NLTK's inference module, for example via an interface to the third-party theorem prover Prover9. The inputs to the inference mechanism first have to be parsed into logical expressions by LogicParser().
+    
+    A nltk.Valuation is a mapping from basic expressions of the logic to their values.  We initialize a Valuation with a list of pairs, each of which consists of a semantic symbol and a semantic value. The resulting object is essentially just a dictionary that maps logical expressions (treated as strings) to appropriate values.
+    You then assign a variable to an assignment object, g = nltk.Assignment(domain), which will act as a dictionary of expressions to variables
+    You can then make a nltk.Model(domain, Valuation). Every model comes with an evaluate() method, which will determine the semantic value of logical expression, such as formulas of propositional logic.
+            model.evaluate(expression, assignment_object)
+        
+10.3   First-Order Logic (FOL)
+
+   Represent the meaning of natural language expressions by translating them into first-order logic. There are excellent systems available off the shelf for carrying out automated inference in first order logic.
+   
+   How formulas of first-order logic are constructed
+   
+   Syntax:
+        
+        The standard construction rules for first-order logic recognize terms such as individual variables and individual constants, and predicates which take differing numbers of arguments.
+        
+        To inspect syntactic structure of expressions of FOL, we can assign types - e: entities, t: formulas. From these we can make complex types for function expressions.
+        
+        The LogicParser can be invoked so that it carries out type checking.  To help the type-checker, we need to specify a signature, implemented as a dictionary that explicitly associates types with non-logical constants.
+        
+    First Order Theorem Proving:
+    
+        Propositional logic is not expressive enough to represent generalizations about binary predicates. first order logic, by contrast, is ideal for formalizing such rules and we can perform automated inference to show the validity of the argument.
+        
+        The general case in theorem proving is to determine whether a formula that we want to prove (a proof goal) can be derived by a finite sequence of inference steps from a list of assumed formulas. 
+        To do this:
+        First, we parse the required proof goal and the two assumptions. Then we create a Prover9 instance, and call its prove() method on the goal, given the list of assumptions.
+
+    Summarizing the Language of First Order Logic:
+    
+        Just a summary table. This is good as a reference.
+    
+    Truth in Model:
+    
+        We need to give a truth-conditional semantics to first-order logic in order to translate English into FOL.
+        
+        Given a first-order logic language L, a model M for L is a pair 〈D, Val〉, where D is an nonempty set called the domain of the model, and Val is a function called the valuation function which assigns values from D to expressions of L as follows:
+
+            For every individual constant c in L, Val(c) is an element of D.
+            For every predicate symbol P of arity n ≥ 0, Val(P) is a function from Dn to {True, False}. (If the arity of P is 0, then Val(P) is simply a truth value, the P is regarded as a propositional symbol.)
+        
+        It's more convenient to think of the Domain as a set of pairs of Domain elements.  That set, given a Characteristic Function, will correspond to a boolean value.
+        
+    Individual Variables and Assignments:
+    
+        Use nltk.Assignment(domain) to map individual variables to entities in the domain. We are not required to actually enter any bindings, but if we do, they are in a (variable, value) format.
+        You can then use the Assignment object to evaluate the truth values of a model. nltk.Model(domain, values).evaluate('inference statement', assignment)
+        The general process of determining truth or falsity of a formula in a model is called model checking.
+        
+    Quantification:
+    
+       Variable satisfaction can be used to provide an interpretation to quantified formulas.
+       One useful tool offered by NLTK is the satisfiers() method. This returns a set of all the individuals that satisfy an open formula. The method parameters are a parsed formula, a variable, and an assignment.
+       Through this tool, we can see that when every member of the domain of discorse satisfies some formula, then the correspding universally quantified formula is also true.
+       
+    Quantifier Scope Ambiguity:
+        
+        Who the fuck do ambiguous term refer to? e.g. Everybody admires someone.
+        One way of exploring the results of quantifier scope is by using the satisfiers() method of Model objects.
+        
+    Model Building:
+        
+        Model building tries to create a new model, given some set of sentences. If it succeeds, then we know that the set is consistent, since we have an existence proof of the model. nltk.Mace().build_model(goal, assumptions_set)
+        We can also use the model builder as an adjunct to the theorem prover (Prover9). Mace4 may well return with a counterexample faster than Prover9 concludes that it cannot find the required proof - Mace4 is faster at disproving unprovables, and Prover9 is faster at proving provables.
+        
+10.4   The Semantics of English Sentences
+
+    Compositional Semantics in Feature-Based Grammar:
+    
+       Principle of Compositionality: The meaning of a whole is a function of the meanings of the parts and of the way they are syntactically combined.
+       
+       Our goal now is integrate the construction a semantic representation in a manner that can be smoothly with the process of parsing - we want to make a tree structure and will assign semantic representation to lexical nodes, then compose the semantic representation for each phrase from those of its child nodes.
+       
+       We can use function application, rather than string concatenation, in constructing the tree: the value of a node is based on the result of  a function taking the node's child values as inputs.
+    
+    The λ-Calculus:
+    
+        We can use lambda notation to specify properties of words like mathematical set notation.
+        λ is a binding operator, just as the first-order logic quantifiers are. If we have an open formula then we can bind a variable with the λ operator.
+            e.g.
+            # open formula
+                (walk(x) ∧ chew_gum(x))
+            # lambda notation
+                λx.(walk(x) ∧ chew_gum(x))
+            # python implementation    
+        		\x.(walk(x) & chew_gum(x))
+        		
+        Lambda Abstraction - result of binding variables in an expression.
+        
+        It has often been suggested that λ-abstracts are good representations for verb phrases (or subjectless clauses), particularly when these occur as arguments in their own right
+        
+        Given an open formula φ with free variable x, abstracting over x yields a property expression λx.φ — the property of being an x such that φ.
+        If φ is an open formula, then the abstract λx.φ can be used as a unary predicate.
+        
+        Beta-Reduction - simplifying open formulas by replacing all free occurances of a variable with an expression.
+        In order to carry of β-reduction of expressions in NLTK, we can call the simplify() method. - parsed_expression.simplify()
+        
+        You can nest lambda expressions, but they are statically typed.
+        
+    Quantified NPs:
+    
+        

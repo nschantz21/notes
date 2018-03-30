@@ -1,0 +1,32 @@
+Statistical inference refers to estimation and hypothesis testing. Estimation is the process of inferring or estimating a population parameter (such as its mean or standard deviation) from the corresponding statistic of a sample drawn from the population. To be valid, estimation (and hypothesis testing) must be based on a representative sample. This can be obtained by random sampling, whereby each member of the population has an equal chance of being included in the sample.
+
+Sample Size should be at least 30 instances
+Stratified sampling is used when the variations within each stratum are small in relation to the variations between strata. Cluster sampling is used when the opposite is the case.
+
+Sample mean, proportion
+standard error of sampling distribution of the mean - standard deviation of the sampling distribution of the mean -  given by the standard deviation of the parent population divided by the square root of the samples’ size. For finite populations of size N, a finite correction factor must be added, unless the sample size is very small relative to the population size - usually less than or equal to 5% of the population size.
+
+sample means, as averages of the sample observations, exhibit less variability or spread than the population values. The larger the sample sizes, the more the standard error of the sample mean are averaged down with respect to the value of the population standard deviation.
+
+An estimator is unbiased if in repeated random sampling from the population the corresponding statistic from the theoretical sampling distribution is equal to the population parameter.
+
+
+An interval estimate refers to a range of values together with the probability, or confidence level, that the interval includes the unknown population parameter.
+
+You can get confidence interval for the uknown population mean and proportions.
+The two numbers defining a confidence interval are called confidence limits.
+Because an interval estimate also expresses the degree of accuracy or confidence we have in the estimate, it is superior to a point estimate.
+
+t - distribution
+When the population is normally distributed but the standard deviation is not known and n < 30, we cannot use the normal distribution for determining confidence intervals for the unknown population mean, but we can use the t distribution.
+t distribution is more platykurtic than standard normal distribution.
+
+
+When n < 30 and the population is not normally distributed, we must use Chebyshev’s theorem
+
+Determining the minimum sample size is important when you want a certain confidence level.
+
+We can obtain the theoretical sampling distribution of the mean from a
+    finite population: taking all possible different samples of size n from the pop and then finding the mean of each sample
+    infinite: hypothetically taking an infinite number of samples of size n from the infinite population and the nfinding the mean of each sample
+    

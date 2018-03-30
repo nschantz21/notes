@@ -1,0 +1,11 @@
+Altman
+
+Which Ratios are most important in detecting bankruptcy potential?
+What weights should be attached to those selected ratios?
+How should the weights be objectively established?
+
+Discriminant Analysis:
+    uses multiple discriminate analysis (MDA)
+    MDA is a statistical technique used to classify an observation into one of several a priori groupings dependent on the observation's individual characteristics.
+    
+    

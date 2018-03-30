@@ -1,0 +1,149 @@
+Financial and Economic Data Applications
+
+Data Munging Topics
+    Time Series and Cross-Section Alignment
+
+        When working with two data sets that don't align perfectly, pandas aligns the data automatically in arithmetic and excludes missing data in functions like sum
+        use the DF1.align(DF2) method to align manually.
+    
+    Operations with Time Series of Different Frequencies
+    
+        The two main tools for frequency conversion and realignment are the resample and reindex methods. resample converts data to a fixed frequency while reindex conforms data to a new index.
+        Using reindex and ffill on the joining dataset is more accurate to maintain the first's index.
+        
+        comparing periods of different frequency requires explicit conversion.
+        Convert the lower frequency data set, reindex and ffill.
+        
+    Time of Day and "as of" Data Selection
+    
+        Indexing a time series with a Python datetime.time object will extract values at those times 
+            TimeSeries[datetime.time.time(10,0)]
+        Can also use the Series.at_time() or .between_time() methods
+        By passing an array of timestamps (like a pandas date_range object) to the asof method, you will obtain an array of the last valid (non-NA) values at or before each timestamp.
+    
+    Splicing Together Data Sources
+    
+        pandas.concat() to splice two DFs or time series together.
+        DataFrame.combine_first(DF2) to bring in data from before the splice point to fill in missing data.
+        
+        DataFrame has a related method update for performing in-place updates. You have to pass overwrite=False to make it only fill the holes
+    
+    Return Indexes and Cumulative Returns
+    
+        This can get complicated for dividend paying stocks, based on how the dividend is spent. also condsider splits and buy backs. this can be partially mitigated using the adj. close price.
+        Essentially you just get the percent change of the adj. close and the cumulative product (compounding return) of the percent change to get the returns index.
+                
+                
+                return_index = (1 + Series['adj_close'].pct_change()).cumprod()
+        
+        Then you can compute the cumulative returns
+        
+                m_returns = return_index.resample('BM', how='last').pct_change()
+        
+        If you had dividend dates and percentages, you can include them in the daily returns
+                
+                returns = Series['adj_close'].pct_change()
+                returns[dividend_dates] += dividend_pcts # add the dividend back to that date's price
+                
+Group Transforms and Analysis
+
+    you can group by industry and assign z scores.
+    
+        def zscore(group):
+            return (group - group.mean()) / group.std()
+        df_stand = by_industry.apply(zscore)
+        
+    or use the rank() method.  
+    In quantitative equity, "rank and standardize" is a common sequence of transforms. to get the rank z scores:
+            
+            by_industry = df.groupby(industries)
+            by_industry.apply(lambda x: zscore(x.rank()))
+            
+    Group Factor Exposures
+    
+        Factor analysis is a technique in quantitative portfolio management. Portfolio holdings and performance (profit and less) are decomposed using one or more factors (risk factors are one example) represented as a portfolio of weights.
+        The standard way to compute the factor exposures is by least squares regression; using pandas.ols with factors as the explanatory variables we can compute exposures over the entire set of tickers
+                
+                pd.ols(y=port, x=factors).beta
+            
+        You can group the portfolio however you want and apply the factor exposures. then unstack it to get a DF.
+        
+    Decile and Quartile Analysis
+        
+        Using pandas.qcut combined with groupby makes quantile analysis reasonably straightforward.
+        Trailing one-year annualized standard deviation is a simple measure of volatility, and we can compute Sharpe ratios to assess the reward-to-risk ratio in various volatility regimes (given by the quantile cut)
+            volatility = DF['returns'].rolling(window = 250, min_periods = 200) * np.sqrt (250)
+            def sharpe(rets, ann=250):
+                return rets.mean() / rets.std() * np.sqrt(ann)
+        
+        you can then qcut by volatility and assess the sharpe of the groups
+        
+            trade_rets.groupby(pd.qcut(vol, 4)).agg(sharpe)
+            
+Signal Frontier Analysis
+
+    First, get price data and calculate the cumulative returns of each stock
+    
+    For the portfolio construction, compute momentum over certain lookback, then rank in descending order and standardize
+     
+        def calc_mom(price, lookback, lag):
+            # calculate the momentum over certain lookback
+            mom_ret = price.shift(lag).pct_change(lookback)
+            ranks = mom_ret.rank(axis=1, ascending=False)
+            demeaned = ranks - ranks.mean(axis=1)
+            return demeaned / demeaned.std(axis=1)
+        
+    a strategy backtesting function that computes a portfolio for a particular lookback and holding period, returning the overall Sharpe ratio
+    
+    # helper functions
+    compound = lambda x : (1 + x).prod() - 1
+    daily_sr = lambda x: x.mean() / x.std()
+    
+    def strat_sr(prices, lb, hold):
+        # Compute portfolio weights
+        freq = '%dB' % hold
+        port = calc_mom(prices, lb, lag=1) # standardized ranks provide the weights
+        
+        daily_rets = prices.pct_change()
+        
+        # Compute portfolio returns
+        port = port.shift(1).resample(freq, how='first')
+        returns = daily_rets.resample(freq, how=compound)
+        port_rets = (port * returns).sum(axis=1)
+        
+        # returns scalar value of Sharpe Ratio
+        return daily_sr(port_rets) * np.sqrt(252 / hold)
+    
+    You can then calculate the strat_sr for a matrix of inputs - array of lookback periods by array of holding periods.
+    Then graph as a heatmap showing the Sharpe Ratio of the portfolios.
+    
+Future Contract Rolling
+
+    It's hard to model trading of futures because there are many contracts for an asset each expiring on a different day.
+    In many cases, the future contract expiring next (the near contract) will be the most liquid (highest volume and lowest bid-ask spread).
+    For the purposes of modeling and forecasting, it can be much easier to work with a continuous return index indicating the profit and loss associated with always holding the near contract.
+    Transitioning from an expiring contract to the next (or far) contract is referred to as rolling.
+    
+    In order to compute a continuous future series from the individual contract data we need to calculate when and how quickly you would trade out of an expiring contract into the next. Essentially turning a discrete function into continuous.
+    
+    You will be transitioning from one contract to the next. Each contract will have a different time series of prices that differ from each other by a random amount. One way to splice time series together into a single continuous series is to construct a weighting matrix - this will tell you the weightings of each contract as you roll.  The only thing left to decide is how you want to roll - linearly, exponentially, etc. - and compute the decay/transfer btwn contracts.
+    
+    Finally, the rolled future returns are just a weighted sum of the contract returns. - this gives you the returns index, which you can measure performance against.
+    
+Rolling Correlation and Linear Regression
+
+    you can get moving correlation of returns using the corr method of a rolling DataFrame object.
+    One issue with correlation between two assets is that it does not capture differences in volatility. Least-squares regression provides another means for modeling the dynamic relationship between a variable and one or more other predictor variables.
+    pandas’s ols function is depreciated - use statsmodels api
+    
+    # moving correlation
+    x_returns.rolling(window = 250).corr(y_returns)
+    
+    # moving linear regression
+    import statsmodels.api as sm
+    X = sm.add_constant(x_returns.values)
+    model = sm.OLS(c_returns.values, X, missing = 'drop')
+    res = mod.fit()
+    res.summary()
+    
+not sure how to get the beta. you need to learn more stats.

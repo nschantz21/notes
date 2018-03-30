@@ -1,0 +1,90 @@
+Data Aggregation and Group Operations
+
+After loading, merging, and preparing a data set, a familiar task is to compute group statistics or possibly pivot tables for reporting or visualization purposes. pandas provides a flexible and high-performance groupby facility, enabling you to slice and dice, and summarize data sets in a natural way
+
+Groupby:
+    A recipe you may find useful is computing a dict of the data pieces as a one-liner
+    
+        pieces = dict(list(df.groupby('key1')))
+    
+        pieces['b']
+    
+    You can group a frame using a dict or Series
+
+        DataFrame.groupby(dict, axis=1)
+    
+    Or using a function. Any function passed as a group key will be called once per index value, with the return values being used as the group names
+
+        DataFrame.groupby(function)
+    
+Data Aggregation
+
+    You can use aggregations of your own devising and additionally call any method that is also defined on the already grouped object.
+    quantile performs linear interpolation if there is no value at exactly the passed percentile.
+    If you pass a list of functions or function names instead, you get back a DataFrame with column names taken from the functions.
+    So if you group a dataset and then call the describe method, you can aggregate the different descriptive stats
+    
+            grouped = DataFrame.groupby(key)
+            grouped.agg(['mean', 'std', your_own_function])
+            
+    if you pass a list of (name, function) tuples, the first element of each tuple will be used as the DataFrame column names.
+    With a DataFrame, you have more options as you can specify a list of functions to apply to all of the columns or different functions per column - gives DataFrame with hierarchical columns.
+    If you want to apply different functions to one or more of the columns, pass a dict to the .agg method that contains a mapping of column names to any of the function specifications.
+    
+    
+Group-wise Operations and Transformations
+
+    transform applies a function to each group, then places the results in the appropriate locations. If each group produces a scalar value, it will be propagated (broadcasted)
+
+Apply: General split-apply-combine
+
+    apply splits the object being manipulated into pieces, invokes the passed function on each piece, then attempts to concatenate the pieces together
+    If you pass a function to apply that takes other arguments or keywords, you can pass these after the function.
+
+Quantile and Bucket Analysis
+
+    To perform quantile or bucket analysis:
+        use pandas.cut to get a Categorical object based on the DataFrame object
+            cut_cat = pandas.cut(DataFrame, number_of_cats)
+        pass the categorical object to the groupby function
+            grouped = DataFrame.groupby(cut_cat)
+        Then apply the function to the Group object
+            grouped.apply(function).unstack()
+        you can also do this for qcut.
+        
+Random Sampling and Permutation:
+    
+    to draw a random sample (with or without replacement) from a large dataset for Monte Carlo simulation purposes or some other application
+    One way is to select the first K elements of np.random.permutation(N), where N is the size of your complete dataset and K the desired sample size
+    
+    Then you can sample using the .take() method or group by whatever and apply the sampling function
+    
+    def random_sampling(DataFrame, n=5):
+        return DataFrame.take(np.random.permutation(len(DataFrame))[:n])
+    
+Group-wise Linear Regression
+    
+    Use the the statsmodels econometrics library) which executes an ordinary least squares (OLS)
+    
+    import statsmodels.api as sm
+    def regress(data, yvar, xvars):
+        Y = data[yvar]
+        X = data[xvars]
+        X['intercept'] = 1.
+        result = sm.OLS(Y, X).fit()
+        return result.params
+        
+Pivot Tables and Cross-Tabulation
+
+    DataFrame.pivot_table()
+    In addition to providing a convenience interface to groupby, pivot_table also can add partial totals, also known as margins
+    This has the effect of adding All row and column labels, with corresponding values being the group statistics for all the data within a single tier
+    
+    To use a different aggregation function, pass it to aggfunc. May want to use fill_na as well.
+    
+Cross-Tabulations: Crosstab
+
+    A cross-tabulation (or crosstab for short) is a special case of a pivot table that computes group frequencies - more convenient than pivoting
+    The first two arguments to crosstab can each either be an array or Series or a list of arrays.
+
+You can normalize within buckets to visualize percentage of total group

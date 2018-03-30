@@ -1,0 +1,39 @@
+Profiling Tools:
+
+To profile from the command line
+    
+    python -m cProfile -s cumulative cprof_example.py
+
+IPython has a convenient interface to this capability using the %prun command and the -p option to %run. %prun takes the same "command line options" as cProfile but will profile an arbitrary Python statement instead of a whole .py file:
+
+    %prun -l 7 -s cumulative run_experiment() # for statement
+    %run -p -s cumulative cprof_example.py # for file
+
+%lprun computes a line-by-line-profiling of one or more functions. With the line_profiler IPython extension activated, a new command %lprun is available. The only difference in usage is that we must instruct %lprun which function or functions we wish to profile.
+
+    %load_ext line_profiler
+    %lprun -f func1 -f func2 statement_to_profile
+    
+The %debug command, when entered immediately after an exception, invokes the "post-mortem" debugger and drops you into the stack frame where the exception was raised
+
+Executing the %pdb command makes it so that IPython automatically invokes the debugger after any exception, a mode that many users will find especially useful.
+
+%time runs a statement once, reporting the total execution time. The Wall time is the main number of interest.
+To get a more precise measurement, use the %timeit magic function. Given an arbitrary statement, it has a heuristic to run a statement multiple times to produce a fairly accurate average runtime.
+%timeit is especially useful for analyzing statements and functions with very short execution times, even at the level of microseconds
+
+
+Interacting with the Operating System
+    !cmd Execute cmd in the system shell
+    output = !cmd args Run cmd and store the stdout in output
+    %alias alias_name cmd Define an alias for a system (shell) command
+    %bookmark Utilize IPython’s directory bookmarking system
+    %cd directory Change system working directory to passed directory
+    %pwd Return the current system working directory
+    %pushd directory Place current directory on stack and change to target    directory
+    %popd Change to directory popped off the top of the stack
+    %dirs Return a list containing the current directory stack
+    %dhist Print the history of visited directories
+    %env Return the system environment variables as a dict
+    
+Logging is turned on by typing %logstart.  %logoff, %logon, %logstate, and %logstop

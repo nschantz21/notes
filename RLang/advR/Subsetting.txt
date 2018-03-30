@@ -1,0 +1,90 @@
+Subsetting
+
+Subsetting is a natural complement to str(). str() shows you the structure of any object, and subsetting allows you to pull out the pieces that you’re interested in.
+
+Data types
+
+    Ways to subset Atomic vectors:
+    
+        Positive integers return elements at the specified positions
+        
+        Negative integers omit elements at the specified positions, and you can’t mix positive and negative integers in a single subset
+        
+        Logical vectors select elements where the corresponding logical value is TRUE, and A missing value in the index always yields a missing value in the output.
+        
+        Nothing (vector[]) returns the original vector. This is not useful for vectors but is very useful for matrices, data frames, and arrays. It can also be useful in conjunction with assignment
+        
+       Zero returns a zero-length vector - helpful for generating test data.
+       
+       Character vectors to return elements with matching names, for named vectors.
+       
+    Lists
+    
+        same as vectors - subsetting with [] will always return a list.  [[]] and $ subsetting return components of list
+        
+    Matrices and arrays
+    
+        can subset with multiple vectors, single vector, or matrix.
+        
+        you supply a 1d index for each dimension, separated by a comma. Blank subsetting lets you keep all rows or all columns
+            matrix[c(1,2,3), ]
+            
+        By default, [ will simplify the results to the lowest possible dimensionality.
+        
+        you can subset a matrix with a vector - will behave like a vector. R arrays are column major.
+        
+        can subset with integer or character matrix (if named).  Each row specifies a index and each column specifies the dimension. - result is vector of values.
+        
+    Data frames
+    
+        if you subset with a single vector, they behave like lists; if you subset with two vectors, they behave like matrices.
+        
+    S3 objects
+        
+        S3 objects are made up of atomic vectors, arrays, and lists - subsetting works like above.
+        
+    S4 objects
+        
+        @ (equivalent to $), and slot() (equivalent to [[). @ is more restrictive than $ in that it will return an error if the slot does not exist.
+    
+    upper.tri(matrix)  # returns the upper triangle of a matrix
+    diag(matrix)  # returns diagonal of matrix
+    
+    
+Subsetting operators
+    
+    You already know this.
+    S3 and S4 objects can override the standard behaviour of [ and [[ so they behave differently for different types of objects. The key difference is usually how you select between simplifying or preserving behaviours, and what the default is.
+    
+    Simplifying vs. preserving subsetting:
+        
+        simplifying returns simplest possible data structure that can represent the output - useful for interactive. Different for each datatype.
+        Preserving keeps the structure of the output the same as the input - better for programming b/c always the same type. pretty much the same for all data types.
+        
+        Omitting drop = FALSE when subsetting matrices and data frames is one of the most common sources of programming errors.
+        
+    Missing/out of bounds indices:
+        
+        simplifying subsetting out of bounds (OOB) index will usually result in an error. preserving subsetting index will result in NA or NULL.
+        
+Subsetting and assignment
+
+    All subsetting operators can be combined with assignment to modify selected values of the input vector.
+    
+    Subsetting with nothing can be useful in conjunction with assignment because it will preserve the original object class and structure.
+    
+    assign list components to NULL when subsetting to remove them.  To keep NULL in a list, use a nested list(NULL).
+    
+Applications
+
+    Many of these basic techniques are wrapped up into more concise functions (e.g., subset(), merge(), plyr::arrange()
+    
+    Random samples/bootstrap (integer subsetting) - You can use integer indices to perform random sampling or bootstrapping of a vector or data frame. sample() generates a vector of indices, then subsetting to access the values
+    
+    Ordering (integer subsetting) - order() takes a vector as input and returns an integer vector describing how the subsetted vector should be ordered
+    
+    Expanding aggregated counts (integer subsetting) - when duplicate rows have been removed and a count column is added- rep() and integer subsetting make it easy to uncollapse the data by subsetting with a repeated row index
+    
+    Selecting rows based on a condition (logical subsetting)
+    
+    Boolean algebra vs. sets (logical & integer subsetting) - which() allows you to convert a boolean representation to an integer representation.  In general, avoid switching from logical to integer subsetting unless you want, for example, the first or last TRUE value.

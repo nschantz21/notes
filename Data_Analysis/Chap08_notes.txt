@@ -1,0 +1,51 @@
+Chapter 8: Plotting and Visualization
+
+to import
+    
+    import matplotlib
+    matplotlib.use('Agg') # so you don't need a GUI output
+    import matplotlib.pyplot as plt
+    
+Plots in matplotlib reside within a Figure object. You can create a new figure with
+plt.figure
+
+You have to create one or more subplots using add_subplot
+
+matplotlib draws on the last figure and subplot used (creating one if necessary), thus hiding the figure and subplot creation
+To make a figure and array of the subplots:
+
+    fig, axes = plt.subplots(2, 3)
+
+To save your figure:
+    Figure.savefig(filename)
+    plt.clf() # clears the last figure
+    plt.close() # closes the last figure
+
+savefig doesn’t have to write to disk; it can also write to any file-like object such as a StringIO :
+
+        from io import StringIO
+        buffer = StringIO()
+        plt.savefig(buffer)
+        plot_data = buffer.getvalue()
+        
+For example, this is useful for serving dynamically-generated images over the web.
+
+here are two main ways to interact with the matplotlib configuration system. The first is programmatically from Python using the rc method.
+For more extensive customization and to see a list of all the options, matplotlib comes with a configuration file matplotlibrc in the matplotlib/mpl-data directory. If you customize this file and place it in your home directory titled .matplotlibrc , it will be loaded each time you use matplotlib.
+You can also put it in the cwd if you only want it to affect that project.
+
+In exploratory data analysis it’s helpful to be able to look at all the scatter plots among a group of variables; this is known as a pairs plot or scatter plot matrix. Making such a plot from scratch is a bit of work, so pandas has a scatter_matrix function for creating one from a DataFrame.
+
+To work with maps you need to import the basemaps package
+
+from mpl_toolkits.basemap import Basemap
+
+basemap provides many different globe projections and a means for transforming projecting latitude and longitude coordinates on the globe onto a two-dimensional matplotlib plot.
+basemap allows you to overlap additional map data which comes from what are called shapefiles.  The Basemap object conveniently has a readshapefile method - good for mappign roads and borders and shit..
+
+Check out other data visualization tools:
+
+    Chaco is a plotting tool-kit suitable both for static plotting and interactive visualizations. It is especially well-suited for expressing complex visualizations with data interrelationships.
+    
+    mayavi is a 3D graphics toolkit built on the open source C++ graphics library VTK.
+    

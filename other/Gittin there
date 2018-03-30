@@ -1,0 +1,8 @@
+git init Cython_Book
+    make the directory
+git add README
+    add the file after you make it
+git commit -m "booyah"
+    commit the files
+git remote add origin https://github.com/nschantz21/Cython_Book.git
+    

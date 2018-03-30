@@ -1,0 +1,118 @@
+Chapter 7: Extracting Information from Text
+
+    How can we build a system that extracts structured data, such as tables, from unstructured text?
+    What are some robust methods for identifying the entities and relationships described in a text?
+    Which corpora are appropriate for this work, and how do we use them for training and evaluating our models?
+
+7.1   Information Extraction
+    
+    convert unstructured data to structured data, then get meaning from text.
+    
+    Information Extraction Architecture:
+        
+        1. Split raw text into sentences
+        2. divide sentence into words using tokenizer
+        3. tag each sentence with part-of-speech tags - allows named entity detection
+        
+        4. detect entities using definite noun phrases, proper names, indefinite nouns, noun chunks. 
+        5. search for specific patterns between pairs of entities that occur near one another in the text, and use those patterns to build tuples recording the relationships between the entities
+        
+7.2   Chunking
+
+    basic technique we will use for entity detection - segments and labels multi-token sequences. No overlapping of chunks.
+    
+    Noun Phrase Chunking:
+    
+        NP-Chunking - search for chunks corresponding to individual noun phrases
+        NP-chunks are defined so as not to contain other NP-chunks -> any prepositional phrases or subordinate clauses that modify a nominal will not be included in the corresponding NP-chunk, since they almost certainly contain further noun phrases
+        
+        to create an NP-chunker, define a chunk grammar - rules for how to chunk sentences
+        
+    Tag Patterns:
+    
+        tag pattern is regex-like sequence of pos tags, using angled brackets
+    
+    Chunking with Regular Expressions:
+    
+        allows for successive chunking rules
+            nltk.RegexpParser(grammar)
+            {<Tag>Regexp}
+    
+    Exploring Text Corpora:
+        
+        it's easier with chunking  - results in tree (node) structured data.
+        
+    Chinking:
+    
+        chink - sequence of tokens that is not included in a chunk.
+        Chinking - removing a sequence of tokens from a chunk.
+        Can delete, split, or parse chunk. will result in two chunks
+            uses    }<Tag>Regexp{
+        
+    Representing Chunks: Tags vs Trees
+    
+        The most widespread file representation of chunks uses IOB tags.        Each token is tagged with one of three special chunk tags:
+                I (inside the chunk), O (outside the chunk), or B (beginning of chunk)
+            I and B tags are suffixed with chunk type.
+            
+        
+        however, NLTK uses trees for its internal representation of chunks.
+        
+7.3   Developing and Evaluating Chunkers
+
+    Reading IOB Format and the CoNLL 2000 Corpus:
+        
+        chunk.conllstr2tree() builds tree representation from multi-line IOB notated string , and specify subset by chunk type.
+        
+    Simple Evaluation and Baselines:
+    
+        Call evaluate() method on chunk parser to get accuracy scores based on a chunked sample. you have to pass it the correctly chunked sample.
+        Can build a chunker based on unigram tagger -> determine correct chunk tags based on part-of-speech tag.
+    
+    Training Classifier-Based Chunkers
+        
+        we need to make use of information about the content of the words, in addition to just their part-of-speech tags, if we wish to maximize chunking performance.
+        One way that we can incorporate information about the content of words is to use a classifier-based tagger to chunk the sentence - Assign IOB tags to the words in a sentence.
+        You need to make a feature extractor for the classifier-based tagger - using important features of the words.
+        
+7.4   Recursion in Linguistic Structure
+
+    Building Nested Structure with Cascaded Chunkers:
+    
+        it is possible to build chunk structures of arbitrary depth, simply by creating a multi-stage chunk grammar containing recursive rules. However, creating and debugging a cascade is difficult, and there comes a point where it is more effective to do full parsing. The cascading process can only produce trees of fixed depth and this is insufficient for complete syntactic analysis.
+       This is the basis for the Cass Chunker - paper link at the end of notes. 
+            nltk.RegexpParser(grammar, loop=2)
+        
+    Trees:
+    
+        NLTK has a Tree object type. 
+        nltk.Tree(parent_node, child_node)
+        Tree object has draw method for graphical representation.
+        
+    Tree Traversal:
+    
+        see traverse function in Chap7.py
+        
+    
+7.5   Named Entity Recognition
+
+    Named entity recognition (NER) system is to identify all textual mentions of the named entities.This can be broken down into two sub-tasks: 
+         1.identifying the boundaries of the NE
+         2. identifying its type. a prelude to identifying relations in Information Extraction.
+     
+    To accomplish this we need to be able to identify the beginning and end of multi-token sequences - well-suited to the type of classifier-based approach for noun phrase chunking.
+    Build a tagger that labels each word in a sentence using the IOB format, where chunks are labeled by their appropriate type.
+    NLTK provides a classifier that has already been trained to recognize named entities - nltk.ne_chunk(binary=True)
+    
+7.6   Relation Extraction
+
+    To extract relations between Named Entities, we can use regular expressions to search for string patterns in between Named Entities - (NE1, regexp, NE2)
+    This takes some fine-tuning, and can be improved if pos tags exist in the corpus.  
+    
+    
+7.7 Summary
+
+    typical architecture for an information extraction system begins by segmenting, tokenizing, and part-of-speech tagging the text.The resulting data is then searched for specific types of entity. Finally, the information extraction system looks at entities that are mentioned near one another in the text, and tries to determine whether specific relationships hold between those entities.
+    
+    Paper on chunking:
+        http://www.vinartus.net/spa/97a.pdf

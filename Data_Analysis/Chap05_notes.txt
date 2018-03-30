@@ -1,0 +1,17 @@
+Getting Started with pandas
+
+    you pretty much know all this already.
+    
+    use multiindexing to simulate multidimensional array.  You can do summary stats by index level.
+        
+        frame.sum(level='key2')
+        frame.sum(level='color', axis=1)
+        
+
+Passing how='all' will only drop rows that are all NA:
+    
+    data.dropna(how='all')
+    
+you can also filter out rows containing a certain number of observations.
+
+    df.dropna(thresh=3) # three columns need to have values

@@ -1,0 +1,233 @@
+
+Creating a Project:
+    auto generate code that establishes a Django Project:
+        $ django-admin startproject [name of your project] .
+        don't forget the period at the end to create the directory in a sub folder.
+        don't name it test or django or something that will cause conflicts
+    Put your code in some directory outside of the document root, such as /home/mycode, or else it could be a security risk.
+
+    The development server:
+        go to the dir with the manage.py file, then use:
+            $ python manage.py runserver $IP:$PORT
+        you need to add the local URL to the allowed hosts list in the project/setting.py file
+        You’ve started the Django development server, a lightweight Web server written purely in Python. We’ve included this with Django so you can develop things rapidly, without having to deal with configuring a production server – such as Apache – until you’re ready for production. - don't use this for production.
+    
+Creating an App:
+
+    Each application you write in Django consists of a Python package that follows a certain convention. Django comes with a utility that automatically generates the basic directory structure of an app, so you can focus on writing code rather than creating directories.
+    Your apps can live anywhere on your Python path.
+    To start your app:
+        $ python manage.py startapp [your app name]
+        
+
+The Views:
+
+    This is a file in the app directory. It defines how the pages respond to types of Http requests and how the response looks (implemented through template html files).
+    To call the view, though, we need to map it to a URL - and for this we need a URLconf.
+    To create a URLconf in the app's directory, create a file called urls.py
+    The urls.py file acts as a table of contents for the app.
+    
+    we then need to point the root (project's) urlconf to the app's urls module.
+    The include() function allows referencing other URLconfs. Note that the regular expressions for the include() function doesn’t have a $ (end-of-string match character) but rather a trailing slash. Whenever Django encounters include(), it chops off whatever part of the URL matched up to that point and sends the remaining string to the included URLconf for further processing.
+    
+    Once you expose a view through the url config you can run the dev server.
+        $ python manage.py runserver $IP:$PORT
+        and navigate to http://localhost:$PORT/[appname]/
+    
+    The url() function (in both the project and the app directories) is passed four arguments, two required: regex and view, and two optional: kwargs, and name.
+    
+Database setup:
+
+    By default, the configuration uses SQLite, but you should use Use PostgreSQL. You need to set the ENGINE and NAME variables in the project settings file corresponding to the db.  You may also need to set the  USER, PASSWORD, and HOST and some other stuff - check out the docs.  make sure to check that your db is set up and that the project user has create database privileges before moving on.  Also update the TIME_ZONE to your timezone.
+    After the db is created you need to run:
+        $ python manage.py migrate
+    The migrate command looks at the INSTALLED_APPS in the setting.py file and creates any necessary database tables according to the database settings in your project's settings.py file and the database migrations shipped with the app (like if you had already made it).
+    
+Creating models:
+    
+    you need to define your models – essentially, your database layout, with additional metadata.  A model is the single, definitive source of truth about your data. It contains the essential fields and behaviors of the data you’re storing. Django follows the DRY (Don't Repeat Yourself) Principle. The goal is to define your data model in one place and automatically derive things from it.  migrations are entirely derived from your models file, and are essentially just a history that Django can roll through to update your database schema to match your current models.
+    The models are set up in the app's models.py file.
+    Each model is represented by a class that subclasses django.db.models.Model. Each model has a number of class variables, each of which represents a database field in the model.  The python variable name is the SQL column name.
+    You can set up relationships between model classes as well. a relationship is defined, using ForeignKey. Django supports all the common database relationships: many-to-one, many-to-many, and one-to-one.  You can set it up so that if you delete the independent, the dependents will also be deleted.
+    It’s important to add __str__() methods to your models, not only for your own convenience when dealing with the interactive prompt, but also because objects’ representations are used throughout Django’s automatically-generated admin.
+
+Activating models:
+
+    once you set up the models file in the app, you need to add  a reference to its configuration class in the INSTALLED_APPS setting. This configuration class is in the app's apps.py file.  It uses a dotted path  - [your app name].apps.[configuration class] - like a python import.
+    
+    then you need to update the db schema:
+        $ python manage.py makemigrations [your app name]
+        
+    By running makemigrations, you’re telling Django that you’ve made some changes to your models and that you’d like the changes to be stored as a migration.
+    
+    you can view the migration changes with:
+        $ python manage.py sqlmigrate
+        
+    followed by the migration file name.
+    you can check for migration issues with:
+        $  python manage.py check
+    
+    then finally to implement the changes:
+        $ python manage.py migrate
+    
+    The reason that there are separate commands to make and apply migrations is because you’ll commit migrations to your version control system and ship them with your app; they not only make your development easier, they’re also useable by other developers and in production.
+
+Playing with the API:
+
+    you can get to the Django IPython interpreter through:
+        $ python manage.py shell
+        
+    you can change the models through this if you save the model - kinda dangerous since it doesn't appear in the models file, but does get pushed to the SQL db.
+
+Django Admin:
+    
+    
+    to create an admin:
+        $ python manage.py createsuperuser
+        
+    it asks for username, email, and password
+    You can access the admin page through the dev server - go to the local domain + /admin/
+    
+    To make your apps modifiable through the admin page, tell the admin that the model object has an admin interface by registering the model object in the app's admin.py file.
+    
+    The different model field types (DateTimeField, CharField) correspond to the appropriate HTML input widget. Each type of field knows how to display itself in the Django admin.
+    
+    go to http://finance-py-nschantz21.c9users.io:8080/admin/ to see the output
+    
+Views that do something:
+
+    Each view is responsible for doing one of two things: returning an HttpResponse object containing the content for the requested page, or raising an exception such as Http404.
+    
+    You can edit each view seperately directly in the app's views.py file, or you can use Django's Templates system. To do this you need to create a templates folder in the app's directory.
+    
+    Your project’s TEMPLATES setting describes how Django will load and render templates. The default settings file configures a DjangoTemplates backend whose APP_DIRS option is set to True. By convention DjangoTemplates looks for a “templates” subdirectory in each of the INSTALLED_APPS. 
+    
+    Within the templates directory, you need to make another folder named for your app, which will then contain the template html file 
+            ex. app_directory/templates/app_name/template_file.html
+    This is really annoying, but it is necessary for larger project namespacing; however, you can simply refer to it as "app_name/template_file.html" in Django.
+    
+    You can then use that template through the views.py file.
+    That code loads the template and passes it a context. The context is a dictionary mapping template variable names to Python objects.
+    
+    use render() to load a template, fill a context and return an HttpResponse object with the result of the rendered template. Then you don't need to use Django's loader() and HttpResponse() functions.
+    
+Raising a 404 error:
+
+    Use the get_object_or_404() shortcut.  in the views functions.
+    The get_object_or_404() function takes a Django model as its first argument and an arbitrary number of keyword arguments, which it passes to the get() function of the model’s manager. It raises Http404 if the object doesn’t exist.
+
+Removing hardcoded URLs in templates:
+
+    You can hard code the templates to use the path to the url files, or if you name the url paths in the app's url file, you can remove reliance on specific url paths defined in your url configurations by using the {% url %} template tag.
+    The way this works is by looking up the URL definition as specified in the app's urls module
+    this way you can change the url of your views in the url file rather than directly in the template.
+    The template is supplied with a name.  It looks in the url file for that name, and constructs the url accourding to that url function.
+    
+Namespacing URL names:
+
+    How does one make it so that Django knows which app view to create for a url when using the {% url %} template tag when using similarly named views in seperate apps of the same project?
+    The answer is to add namespaces to your URLconf.  add an app_name to set the application namespace.
+    Then edit the templates to look at the namespaced views in the url tag.
+    
+
+    
+Write a simple form:
+
+    Using method="post" (as opposed to method="get") is very important, because the act of submitting this form will alter data server-side. Whenever you create a form that alters data server-side, use method="post". This tip isn’t specific to Django; it’s just good Web development practice.
+    all POST forms that are targeted at internal URLs should use the {% csrf_token %} template tag.
+    in the app's views file you then define how the POST requests are handled.  you should always return an HttpResponseRedirect after successfully dealing with POST data.
+    look out for race conditions in data submition that yields a result.
+    
+Use generic views: Less code is better:
+
+    getting data from the database according to a parameter passed in the URL, loading a template and returning the rendered template is very common, so Django provides generic views.
+    Set the URLconf to look in the right app folders based on the regex matched patterns.
+    Then update the views file to use the generic views.  Each generic view needs to know what model it will be acting upon. This is provided using the model attribute.  The templates used by the generic view have a default naming convention, but you can over ride this with the template_name attribute, which can be useful if you want to differentiate view classes that inherit from the same generic view.
+    
+
+Introducing Automated Testing :
+
+    Basic testing strategies:
+    
+    describe a problem, then create some code to solve it.
+    it’s fruitful to write your first test the next time you make a change, either when you add a new feature or fix a bug.
+    
+    Running tests:
+    
+    A conventional place for an application’s tests is in the application’s tests.py file; the testing system will automatically find tests in any file whose name begins with test.
+    This then extends to django.test.TestCase subclass methods that begin with "test" within that test file.
+    
+    Fixing the bug:
+    
+    fix the relevant bug, but keep the test. that way we'll know if the bug gets reintroduced.  another reason to also track changes.
+    
+    Test for a View:
+    
+    Django provides a test Client to simulate a user interacting with the code at the view level. We can use it in tests.py or even in the shell.
+    In shell: setup_test_environment() installs a template renderer which will allow us to examine some additional attributes on responses such as response.context that otherwise wouldn’t be available. This does not setup a test database, so the following will be run against the existing database and the output may differ slightly depending on what questions you already created.
+    but we can also, and more easily add these tests to the test file. And so on. In effect, we are using the tests to tell a story of admin input and user experience on the site, and checking that at every state and for every new change in the state of the system, the expected results are published.
+    whatever needs to be added to the software to accomplish this should be accompanied by a test, whether you write the test first and then make the code pass the test, or work out the logic in your code first and then write a test to prove it.
+    At a certain point you are bound to look at your tests and wonder whether your code is suffering from test bloat.
+    
+    When testing, more is better:
+    
+    It might seem that our tests are growing out of control. At this rate there will soon be more code in our tests than in our application, and the repetition is unaesthetic, compared to the elegant conciseness of the rest of our code.
+    It doesn’t matter. Let them grow. For the most part, you can write a test once and then forget about it. It will continue performing its useful function as you continue to develop your program. - if you update and something doesn't work, the old tests will tell you exactly what doesn't work.
+    As long as your tests are sensibly arranged, they won’t become unmanageable. Good rules-of-thumb include having:
+        1.  a separate TestClass for each model or view
+        2.  a separate test method for each set of conditions you want to test
+        3.  test method names that describe their function
+    
+    
+    Further Testing :
+    
+    If you have a complex application, you may want to run tests automatically with every commit for the purposes of continuous integration, so that quality control is itself - at least partially - automated.
+
+Static Files:
+
+    Aside from the HTML generated by the server, web applications generally need to serve additional files — such as images, JavaScript, or CSS — necessary to render the complete web page. In Django, we refer to these files as “static files”.
+    
+    django.contrib.staticfiles collects static files from each of your applications (and any other places you specify) into a single location that can easily be served in production.
+    
+    Django will choose the first static file it finds whose name matches, and if you had a static file with the same name in a different application, Django would be unable to distinguish between them. We need to be able to point Django at the right one, and the easiest way to ensure this is by namespacing them. That is, by putting those static files inside another directory named for the application itself.
+    
+    The {% static 'filepath/style.css' %} template tag generates the absolute URL of static files.
+    
+    Of course the {% static %} template tag is not available for use in static files like your stylesheet which aren’t generated by Django. You should always use relative paths to link your static files between each other, because then you can change STATIC_URL (used by the static template tag to generate its URLs) without having to modify a bunch of paths in your static files as well.
+
+Customize the admin form:
+
+    Often, you’ll want to customize how the admin form looks and works. You’ll do this by telling Django the options you want when you register the object - in the admin python file in the app's folder.
+    
+    You’ll follow this pattern – create a model admin class, then pass it as the second argument to admin.site.register() – any time you need to change the admin options for a model.
+    
+    you can split the field with the fieldsets list argument.
+    
+    Django knows that a ForeignKey should be represented in the admin as a <select> box.
+    
+    Django offers a tabular way of displaying inline related objects. The class needs to be derived from the admin.TabularInline class to be displayed in a more compact, table-based format rather than stacked individually - through admin.StackedInline.
+    
+    Django displays the str() of each object called by the admin page. But sometimes it’d be more helpful if we could display individual fields. To do that, use the list_display admin option, which is a tuple of field names to display, as columns, on the change list page for the object:
+            list_display = (comma seperated strings)
+    On the admin page sorting the registered classes by the output of an arbitrary method is not supported natively. You can add a filter for that field, or even a search for a field.  Django will usually know how to filter a field based on it's type (datetime -> filter by date).
+    You can add as many seach fields as you want – although because it uses a LIKE query behind the scenes, limiting the number of search fields to a reasonable number will make it easier for your database to do the search.
+    change lists give you free pagination - default is 100 items per page.
+    
+    to customize the project's templates:
+    
+        Create a templates directory in your project directory (the one that contains manage.py). Templates can live anywhere on your filesystem that Django can access. (Django runs as whatever user your server runs.) However, keeping your templates within the project is a good convention to follow.
+        Open your settings file (mysite/settings.py, remember) and add a DIRS option in the TEMPLATES setting:
+                'DIRS': [os.path.join(BASE_DIR, 'templates')]
+            DIRS is a list of filesystem directories to check when loading Django templates; it’s a search path.
+        Note that any of Django’s default admin templates can be overridden. To override a template, copy it from the default directory into your custom directory, and make changes. 
+        
+    Customizing your application’s templates:
+        
+        Since in the project's setting file, APP_DIRS is set to True, Django automatically looks for a templates/ subdirectory within each application package, for use as a fallback.
+        If you want to use one of the apps in another project then it will have it's own templates directory.
+        
+    Customize the admin index page:
+    
+        By default, it displays all the apps in INSTALLED_APPS that have been registered with the admin application, in alphabetical order.
+        Copy the default Django tempalte (index.html) into the project templates/admin directory to change it.
+        Edit the file, and you’ll see it uses a template variable called app_list. That variable contains every installed Django app. Instead of using that, you can hard-code links to object-specific admin pages in whatever way you think is best.
